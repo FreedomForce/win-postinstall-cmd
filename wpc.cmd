@@ -1,11 +1,12 @@
 @echo off
 cd /d %~dp0
-::						FIRST CHAPTER 
+::						FIRST CHAPTER | UPDATES AND USER SETTINGS
+powershell write-host "CHECK IF WINGET IS INSTALLED" -fore Yellow -back Blue
+powershell Start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
+::
 powershell write-host "CHECK FOR UPDATES" -fore Yellow -back Blue
 powershell Start ms-settings:windowsupdate-action
 ::
-powershell write-host "CHECK IF WINGET IS INSTALLED" -fore Yellow -back Blue
-powershell Start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
 pause
 ::
 powershell write-host DISABLE HIBERNATE -fore Yellow -back Blue
@@ -195,7 +196,7 @@ del winget.json 2>NUL
 ::
 echo {>> winget.json
 echo 	"$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> winget.json
-echo 	"CreationDate" : "2022-07-28T00:13:12.100-00:00",>> winget.json
+echo 	"CreationDate" : "2022-07",>> winget.json
 echo 	"Sources" : >> winget.json
 echo 	[>> winget.json
 echo 		{>> winget.json
@@ -277,7 +278,6 @@ echo 				"Type" : "Microsoft.PreIndexed.Package">> winget.json
 echo 			}>> winget.json
 echo 		}>> winget.json
 echo 	],>> winget.json
-echo 	"WinGetVersion" : "1.2.11601">> winget.json
 echo }>> winget.json
 ::
 powershell write-host FILE CREATED -fore Black -back White
