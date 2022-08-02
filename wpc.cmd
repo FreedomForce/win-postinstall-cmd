@@ -295,6 +295,8 @@ powershell write-host DELETING CREATED FILES AND RESTARTING THE SYSTEM -fore Yel
 ::
 del winget.json 2>NUL
 del settings.reg 2>NUL
+:: DELETING INSTALLERS CREATED BY WINGET
+del /s /q %Temp%\WinGet\* & rmdir /s /q %Temp%\WinGet\
 ::
 pause
 :: 
