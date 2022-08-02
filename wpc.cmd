@@ -97,6 +97,10 @@ echo.>> settings.reg
 echo.>> settings.reg
 echo.>> settings.reg
 echo ; EXPLORER>> settings.reg
+echo ; Disable Compact Mode>> settings.reg
+echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
+echo "UseCompactMode"=dword:00000001>> settings.reg
+echo.>> settings.reg
 echo ; Open file explorer to this pc>> settings.reg
 echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
 echo "LaunchTo"=dword:00000001>> settings.reg
@@ -147,23 +151,19 @@ echo ; Restore the classic context menu 4 w11>> settings.reg
 echo [HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32]>> settings.reg
 echo @="">> settings.reg
 echo.>> settings.reg
-echo ;Disable "Suggest ways to get the most out of Windows and finish setting up this device">> settings.reg
+echo ; Disable "Suggest ways to get the most out of Windows and finish setting up this device">> settings.reg
 echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement]>> settings.reg
 echo "ScoobeSystemSettingEnabled"=dword:00000000>> settings.reg
 echo.>> settings.reg
-echo ;Disable "Windows Experience ...">> settings.reg
+echo ; Disable "Windows Experience ...">> settings.reg
 echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]>> settings.reg
 echo "SubscribedContent-310093Enabled"=dword:00000000>> settings.reg
 echo.>> settings.reg
-echo ;Disable "Get tips and suggestions when using Windows">> settings.reg
+echo ; Disable "Get tips and suggestions when using Windows">> settings.reg
 echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]>> settings.reg
 echo "SubscribedContent-338389Enabled"=dword:00000000>> settings.reg
 echo.>> settings.reg
-echo ;Disable Compact Mode>> settings.reg
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "UseCompactMode"=dword:00000001>> settings.reg
-echo.>> settings.reg
-echo ;Enable NumLock by default>> settings.reg
+echo ; Enable NumLock by default>> settings.reg
 echo [HKEY_USERS\.DEFAULT\Control Panel\Keyboard]>> settings.reg
 echo "InitialKeyboardIndicators"="2147483650">> settings.reg
 echo.>> settings.reg
