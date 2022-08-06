@@ -1,31 +1,50 @@
 @echo off
 cd /d %~dp0
+set breakline=--------------------------------------------------
+set "print=echo. & echo"
+::
+:MENU
+cls
+%print% SELECT YOUR TASK:
+echo.
+echo [1] CHECK FOR UPDATES AND CHECK IF WINGET IS INSTALLED
+echo [2] DISABLE HIBERNATE AND DISABLE PASSWORD EXPIRATION
+echo [3] CREATE REGISTRY FILE AND IMPORTING REGISTRY KEYS
+echo [4] CREATING WINGET FILE AND INITIALIZATION
+echo [5] DELETE CREATED FILES
+echo [6] RESTART THE SYSTEM
+::
+echo. & set /p M=ENTER THE NUMBER: 
+IF %M%==1 GOTO UPDATE
+IF %M%==2 GOTO HIBERNATEandPASSWORD
+IF %M%==3 GOTO REGISTRY
+IF %M%==4 GOTO WINGET
+IF %M%==5 GOTO DELETE
+IF %M%==6 GOTO RESTART
+::
 ::						FIRST CHAPTER | UPDATES AND USER SETTINGS
-powershell write-host "CHECK IF WINGET IS INSTALLED" -fore Yellow -back Blue
+:UPDATE
+%print%			CHECK IF WINGET IS INSTALLED
 powershell Start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
 ::
-powershell write-host "CHECK FOR UPDATES" -fore Yellow -back Blue
+%print%			CHECK FOR UPDATES
 powershell Start ms-settings:windowsupdate-action
+GOTO MENU
+::
+:HIBERNATEandPASSWORD
+%print%			DISABLE HIBERNATE
+echo. & powercfg /h off && powercfg /a |more
+::
+echo %breakline% & %print%			DISABLE PASSWORD EXPIRATION
+echo. & wmic UserAccount where Name='Workstation' set PasswordExpires=False
 ::
 pause
-::
-powershell write-host DISABLE HIBERNATE -fore Yellow -back Blue
-::
-powercfg /h off && powercfg /a |more
-::
-pause
-::
-powershell write-host DISABLE PASSWORD EXPIRATION -fore Yellow -back Blue
-::
-wmic UserAccount where Name='Workstation' set PasswordExpires=False
-::
-pause
+GOTO MENU
 ::
 ::						SECOND CHAPTER | REGISTRY KEYS
-powershell write-host CREATING REGISTRY FILE -fore Yellow -back Blue
-powershell write-host DELETING EXISTING SETTINGS.REG FILE AND CREATING A NEW ONE -fore Green
-::
-del settings.reg 2>NUL
+:REGISTRY
+%print%			CREATING REGISTRY FILE
+del settings.reg 2>NUL && echo DELETING EXISTING SETTINGS.REG FILE AND CREATING A NEW ONE
 ::
 echo Windows Registry Editor Version 5.00>> settings.reg
 echo.>> settings.reg
@@ -178,21 +197,21 @@ echo.>> settings.reg
 echo [HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys]>> settings.reg
 echo "Flags"="34">> settings.reg
 ::
-powershell write-host FILE CREATED -fore Black -back White
+echo FILE CREATED
 ::
 pause
 ::
-powershell write-host IMPORTING REGISTRY KEYS -fore Yellow -back Blue
+echo %breakline% & %print%			IMPORTING REGISTRY KEYS
 ::
-settings.reg && powershell write-host OK -fore Black -back White
+settings.reg && echo OK
 ::
 pause
+GOTO MENU
 ::
 ::						THIRD CHAPTER | WINGET
-powershell write-host CREATING WINGET FILE -fore Yellow -back Blue
-powershell write-host DELETING EXISTING WINGET.JSON FILE AND CREATING A NEW ONE -fore Green
-::
-del winget.json 2>NUL
+:WINGET
+%print%			CREATING WINGET FILE
+del winget.json 2>NUL && echo DELETING EXISTING WINGET.JSON FILE AND CREATING A NEW ONE
 ::
 echo {>> winget.json
 echo 	"$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> winget.json
@@ -206,31 +225,34 @@ echo 				{>> winget.json
 echo 					"PackageIdentifier" : "7zip.7zip">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
+echo 					"PackageIdentifier" : "Mozilla.Firefox.ESR">> winget.json
+echo 				},>> winget.json
+echo 				{>> winget.json
+echo 					"PackageIdentifier" : "Google.Chrome">> winget.json
+echo 				},>> winget.json
+echo 				{>> winget.json
+echo 					"PackageIdentifier" : "Notepad++.Notepad++">> winget.json
+echo 				},>> winget.json
+echo 				{>> winget.json
 echo 					"PackageIdentifier" : "Discord.Discord">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
 echo 					"PackageIdentifier" : "Parsec.Parsec">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
-echo 					"PackageIdentifier" : "Mozilla.Firefox.ESR">> winget.json
+echo 					"PackageIdentifier" : "Valve.Steam">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
-echo 					"PackageIdentifier" : "Notepad++.Notepad++">> winget.json
-echo 				},>> winget.json
-echo 				{>> winget.json
-echo 					"PackageIdentifier" : "OBSProject.OBSStudio">> winget.json
+echo 					"PackageIdentifier" : "EpicGames.EpicGamesLauncher">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
 echo 					"PackageIdentifier" : "Ubisoft.Connect">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
-echo 					"PackageIdentifier" : "Sandboxie.Plus">> winget.json
-echo 				},>> winget.json
-echo 				{>> winget.json
-echo 					"PackageIdentifier" : "Valve.Steam">> winget.json
-echo 				},>> winget.json
-echo 				{>> winget.json
 echo 					"PackageIdentifier" : "Microsoft.Teams">> winget.json
+echo 				},>> winget.json
+echo 				{>> winget.json
+echo 					"PackageIdentifier" : "OBSProject.OBSStudio">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
 echo 					"PackageIdentifier" : "ZeroTier.ZeroTierOne">> winget.json
@@ -239,7 +261,7 @@ echo 				{>> winget.json
 echo 					"PackageIdentifier" : "qBittorrent.qBittorrent">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
-echo 					"PackageIdentifier" : "Google.Chrome">> winget.json
+echo 					"PackageIdentifier" : "Sandboxie.Plus">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
 echo 					"PackageIdentifier" : "Viber.Viber">> winget.json
@@ -264,9 +286,6 @@ echo 					"PackageIdentifier" : "VideoLAN.VLC">> winget.json
 echo 				},>> winget.json
 echo 				{>> winget.json
 echo 					"PackageIdentifier" : "Cloudflare.Warp">> winget.json
-echo 				},>> winget.json
-echo 				{>> winget.json
-echo 					"PackageIdentifier" : "EpicGames.EpicGamesLauncher">> winget.json
 echo 				}>> winget.json
 echo 			],>> winget.json
 echo 			"SourceDetails" : >> winget.json
@@ -277,27 +296,30 @@ echo 				"Name" : "winget",>> winget.json
 echo 				"Type" : "Microsoft.PreIndexed.Package">> winget.json
 echo 			}>> winget.json
 echo 		}>> winget.json
-echo 	],>> winget.json
+echo 	]>> winget.json
 echo }>> winget.json
 ::
-powershell write-host FILE CREATED -fore Black -back White
+%print% FILE CREATED
 ::
 pause
 ::
-powershell write-host WINGET.JSON INITIALIZATION -fore Yellow -back Blue
+echo %breakline% & %print%			WINGET.JSON INITIALIZATION
 ::
 winget import -i .\winget.json --accept-source-agreements --accept-package-agreements
 ::
 pause
+GOTO MENU
 ::
 ::						FOURTH CHAPTER | FINAL
-powershell write-host DELETING CREATED FILES AND RESTARTING THE SYSTEM -fore Yellow -back Blue
+:DELETE
+%print%			DELETING CREATED FILES AND RESTARTING THE SYSTEM
 ::
-del winget.json 2>NUL
-del settings.reg 2>NUL
-:: DELETING INSTALLERS CREATED BY WINGET
-del /s /q %Temp%\WinGet\* & rmdir /s /q %Temp%\WinGet\
+del winget.json 2>NUL & del settings.reg 2>NUL & rmdir /s /q %Temp%\WinGet\ 2>NUL
 ::
+pause
+GOTO MENU
+:RESTART
+%print%			PRESS ENTER TO RESTART THE SYSTEM
 pause
 :: 
 C:\Windows\System32\shutdown.exe /r /t 0
