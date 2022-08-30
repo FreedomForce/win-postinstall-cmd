@@ -6,221 +6,255 @@ set "print=echo. & echo"
 
 :menu
 cls & call :delete
-%print% SELECT YOUR TASK:
-%print% [1] CHECK IF WINGET IS INSTALLED AND CHECK FOR UPDATES
-echo [2] DISABLE HIBERNATE AND DISABLE PASSWORD EXPIRATION
-echo [3] IMPORT SETTINGS
-echo [4] INSTALL APPLICATIONS
+%print% SELECT YOUR TASK: & echo.
+echo: [1] TWEAKS
+echo: [2] IMPORT SETTINGS
+echo: [3] INSTALL APPLICATIONS
 
-set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
-if %number%==1 goto :update
-if %number%==2 goto :hibernateandpassword
-if %number%==3 goto :registry
-if %number%==4 goto :winget
+set "number=Error" & echo. & set /p number= ENTER THE NUMBER: 
+if %number%==1 goto :tweaks
+if %number%==2 goto :registry
+if %number%==3 goto :winget
 goto :menu
 
 rem                     FIRST CHAPTER - UPDATES AND USER SETTINGS
-:update
-echo %breakline% & %print% CHECK IF WINGET IS INSTALLED
-start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
+:tweaks
+cls & %print% SELECT YOUR TASK: & echo.
+echo: [1] CHECK IF WINGET IS INSTALLED
+echo: [2] CHECK FOR UPDATES
+echo: [3] DISABLE HIBERNATE
+echo: [4] DISABLE PASSWORD EXPIRATION
+echo: [5] OPEN OLD MIXER
 
+set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
+if %number%==1 goto :update_winget
+if %number%==2 goto :update_windows
+if %number%==3 goto :disable_hibernate
+if %number%==4 goto :disable_passwordexp
+if %number%==5 goto :open_oldmixer
+goto :tweaks
+
+:update_winget
+%print% CHECK IF WINGET IS INSTALLED
+start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
+goto :tweaks
+
+:update_windows
 %print% CHECK FOR UPDATES
 start ms-settings:windowsupdate-action
-goto :menu
+goto :tweaks
 
-:hibernateandpassword
-echo %breakline% & %print% DISABLE HIBERNATE
+:disable_hibernate
+%print% DISABLE HIBERNATE
 echo. & powercfg /h off && powercfg /a |more
+pause & goto :tweaks
 
-echo %breakline% & %print% DISABLE PASSWORD EXPIRATION
+:disable_passwordexp
+%print% DISABLE PASSWORD EXPIRATION
 echo. & wmic UserAccount where "Name='%username%'" set PasswordExpires=False
-pause & goto :menu
+pause & goto :tweaks
+
+:open_oldmixer
+sndvol.exe
+goto :tweaks
 
 rem                     SECOND CHAPTER - REGISTRY KEYS
 :registry
-echo %breakline% & %print% CREATING REGISTRY FILE
-   
-echo Windows Registry Editor Version 5.00>> settings.reg
-echo.>> settings.reg
+cls & %print% SELECT YOUR TASK: & echo.
+echo: [1] Remove chat from taskbar                             [2] Remove Cortana from taskbar 
+echo: [3] Remove task view from taskbar                        [4] Remove search from taskbar
+echo: [5] Remove meet now                                      [6] Remove news and interests
+echo: [7] Remove taskbar pins                                  [8] Remove Widgets from the Taskbar
+echo: [9] Always hide most used list in start menu             [10] Disable show recently added apps
+echo: [11] Disable "Show recently opened items in Start..."    [12] Disable Compact Mode
+echo: [13] Open file explorer to This PC                       [14] Show file name extensions
+echo: [15] Sound communications do nothing                     [16] Disable startup sound 
+echo: [17] Turn off enhance pointer precision                  [18] Disable automatic maintenance
+echo: [19] Disable "use my sign in info after restart"         [20] Alt tab open windows only
+echo: [21] Restore the classic context menu                    [22] Disable "Suggest ways to get the most out of Windows..."
+echo: [23] Disable "Windows Experience ..."                    [24] Disable "Get tips and suggestions when using Windows"
+echo: [25] Enable NumLock by default                           [26] Disable ease of access settings (Narrator + Sticky Keys)
 
+echo %breakline% & %print% [0] GO BACK
+
+set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
+if %number%==0 goto :menu
+if %number%==1 goto :rm_chat
+if %number%==2 goto :rm_cortana_icon
+if %number%==3 goto :rm_taskview_icon
+if %number%==4 goto :rm_search_icon
+if %number%==5 goto :rm_meet_icon
+if %number%==6 goto :rm_newsandinterests_icon
+if %number%==7 goto :rm_taskbarpins
+if %number%==8 goto :rm_widgetsfromthetaskbar_icon
+if %number%==9 goto :hide_mostusedlist
+if %number%==10 goto :disable_showrecentlyaddedapps
+if %number%==11 goto :disable_showrecentlyopened
+if %number%==12 goto :disable_compactmode
+if %number%==13 goto :enable_openfileexplorer
+if %number%==14 goto :enable_filenameextensions
+if %number%==15 goto :enable_soundcommunications
+if %number%==16 goto :disable_startupsound
+if %number%==17 goto :disable_enhancepointerprecision
+if %number%==18 goto :disable_automaticmaintenance
+if %number%==19 goto :disable_usemysignininfo
+if %number%==20 goto :enable_alttabopenwindowsonly
+if %number%==21 goto :enable_classiccontextmenu
+if %number%==22 goto :disable_suggestways
+if %number%==23 goto :disable_windowsexperience
+if %number%==24 goto :disable_tipsandsuggestions
+if %number%==25 goto :enable_numlock
+if %number%==26 goto :disable_easeofaccesssettings
+goto :registry
+
+:rm_chat
 rem          Remove chat from taskbar
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "TaskbarMn"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarMn /t REG_DWORD /d 00000000
+goto :registry
 
+:rm_cortana_icon
 rem          Remove Cortana from taskbar
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "ShowCortanaButton"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v ShowCortanaButton /t REG_DWORD /d 00000000
+goto :registry
 
+:rm_taskview_icon
 rem          Remove task view from taskbar
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "ShowTaskViewButton"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v ShowTaskViewButton /t REG_DWORD /d 00000000
+goto :registry
 
+:rm_search_icon
 rem          Remove search from taskbar
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]>> settings.reg
-echo "SearchboxTaskbarMode"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search" /f /v SearchboxTaskbarMode /t REG_DWORD /d 00000000
+goto :registry
 
+:rm_meet_icon
 rem          Remove meet now
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]>> settings.reg
-echo "HideSCAMeetNow"=dword:00000001>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideSCAMeetNow /t REG_DWORD /d 00000001
+goto :registry
 
+:rm_newsandinterests_icon
 rem          Remove news and interests
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds]>> settings.reg
-echo "EnableFeeds"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds /t REG_DWORD /d 00000000
+goto :registry
 
+:rm_taskbarpins
 rem          Remove taskbar pins
-echo [-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband]>> settings.reg
-echo.>> settings.reg
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /f /va
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband\AuxilliaryPins" /f
+goto :registry
 
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband\AuxilliaryPins]>> settings.reg
-echo.>> settings.reg
-
+:rm_widgetsfromthetaskbar_icon
 rem          Remove Widgets from the Taskbar
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "TaskbarDa"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarDa /t REG_DWORD /d 00000000
+goto :registry
 
+:hide_mostusedlist
 rem          Always hide most used list in start menu
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]>> settings.reg
-echo "ShowOrHideMostUsedApps"=dword:00000002>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002
+reg delete "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation
+goto :registry
 
-echo [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer]>> settings.reg
-echo "ShowOrHideMostUsedApps"=->> settings.reg
-echo.>> settings.reg
-
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]>> settings.reg
-echo "NoStartMenuMFUprogramsList"=->> settings.reg
-echo "NoInstrumentation"=->> settings.reg
-echo.>> settings.reg
-
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]>> settings.reg
-echo "NoStartMenuMFUprogramsList"=->> settings.reg
-echo "NoInstrumentation"=->> settings.reg
-echo.>> settings.reg
-
+:disable_showrecentlyaddedapps
 rem          Disable show recently added apps
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]>> settings.reg
-echo "HideRecentlyAddedApps"=dword:00000001>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
+goto :registry
 
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]>> settings.reg
-echo "HideRecentlyAddedApps"=dword:00000001>> settings.reg
-echo.>> settings.reg
-
+:disable_showrecentlyopened
 rem          Disable show recently opened items in start, jump lists and file explorer
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "Start_TrackDocs"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v Start_TrackDocs /t REG_DWORD /d 00000000
+goto :registry
 
+:disable_compactmode
 rem          Disable Compact Mode
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "UseCompactMode"=dword:00000001>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v UseCompactMode /t REG_DWORD /d 00000001
+goto :registry
 
+:enable_openfileexplorer
 rem          Open file explorer to this pc
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "LaunchTo"=dword:00000001>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v LaunchTo /t REG_DWORD /d 00000001
+goto :registry
 
+:enable_filenameextensions
 rem          Show file name extensions
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "HideFileExt"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v HideFileExt /t REG_DWORD /d 00000000
+goto :registry
 
+:enable_soundcommunications
 rem          Sound communications do nothing
-echo [HKEY_CURRENT_USER\Software\Microsoft\Multimedia\Audio]>> settings.reg
-echo "UserDuckingPreference"=dword:00000003>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Multimedia\Audio" /f /v UserDuckingPreference /t REG_DWORD /d 00000003
+goto :registry
 
+:disable_startupsound
 rem          Disable startup sound
-echo [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation]>> settings.reg
-echo "DisableStartupSound"=dword:00000001>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation" /f /v DisableStartupSound /t REG_DWORD /d 00000001
+goto :registry
 
+:disable_enhancepointerprecision
 rem          Turn off enhance pointer precision
-echo [HKEY_CURRENT_USER\Control Panel\Mouse]>> settings.reg
-echo "MouseSpeed"="0">> settings.reg
-echo "MouseThreshold1"="0">> settings.reg
-echo "MouseThreshold2"="0">> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseSpeed /t REG_DWORD /d 0
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold1 /t REG_DWORD /d 0
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold2 /t REG_DWORD /d 0
+goto :registry
 
+:disable_automaticmaintenance
 rem          Disable automatic maintenance
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance]>> settings.reg
-echo "MaintenanceDisabled"=dword:00000001>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /f /v MaintenanceDisabled /t REG_DWORD /d 00000001
+goto :registry
 
+:disable_usemysignininfo
 rem          Disable use my sign in info after restart
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]>> settings.reg
-echo "DisableAutomaticRestartSignOn"=dword:00000001>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v DisableAutomaticRestartSignOn /t REG_DWORD /d 00000001
+goto :registry
 
+:enable_alttabopenwindowsonly
 rem          Alt tab open windows only
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]>> settings.reg
-echo "MultiTaskingAltTabFilter"=dword:00000003>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v MultiTaskingAltTabFilter /t REG_DWORD /d 00000003
+goto :registry
 
+:enable_classiccontextmenu
 rem          Restore the classic context menu 4 w11
-echo [HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32]>> settings.reg
-echo @="">> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
+goto :registry
 
+:disable_suggestways
 rem          Disable "Suggest ways to get the most out of Windows and finish setting up this device"
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement]>> settings.reg
-echo "ScoobeSystemSettingEnabled"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /f /v ScoobeSystemSettingEnabled /t REG_DWORD /d 00000000
+goto :registry
 
+:disable_windowsexperience
 rem          Disable "Windows Experience ..."
-echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]>> settings.reg
-echo "SubscribedContent-310093Enabled"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-310093Enabled /t REG_DWORD /d 00000000
+goto :registry
 
+:disable_tipsandsuggestions
 rem          Disable "Get tips and suggestions when using Windows"
-echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]>> settings.reg
-echo "SubscribedContent-338389Enabled"=dword:00000000>> settings.reg
-echo.>> settings.reg
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338389Enabled /t REG_DWORD /d 00000000
+goto :registry
 
+:enable_numlock
 rem          Enable NumLock by default
-echo [HKEY_USERS\.DEFAULT\Control Panel\Keyboard]>> settings.reg
-echo "InitialKeyboardIndicators"="2147483650">> settings.reg
-echo.>> settings.reg
+reg add "HKEY_USERS\.DEFAULT\Control Panel\Keyboard" /f /v InitialKeyboardIndicators /t REG_DWORD /d 2147483650
+goto :registry
 
+:disable_easeofaccesssettings
 rem          Disable ease of access settings
-echo [HKEY_CURRENT_USER\Software\Microsoft\Ease of Access]>> settings.reg
-echo "selfvoice"=dword:00000000>> settings.reg
-echo "selfscan"=dword:00000000>> settings.reg
-echo.>> settings.reg
-
-echo [HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys]>> settings.reg
-echo "Flags"="2">> settings.reg
-echo.>> settings.reg
-
-echo [HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys]>> settings.reg
-echo "Flags"="34">> settings.reg
-
-echo FILE CREATED
-echo %breakline% & echo. & choice /n /m "CONTINUE? [Y/N]"
-if errorlevel 2 goto :menu
-if errorlevel 1 goto :importregistrykeys
-
-:importregistrykeys
-echo %breakline% & %print% IMPORTING REGISTRY KEYS
-regedit /s "settings.reg"
-pause & goto :menu
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /v selfvoice /t REG_DWORD /d 00000000
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /v selfscan /t REG_DWORD /d 00000000
+reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys" /f /v Flags /t REG_DWORD /d 2
+reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys" /f /v Flags /t REG_DWORD /d 34
+goto :registry
 
 rem                     THIRD CHAPTER - WINGET
 :winget
 goto :startofthewingetfile
 
 :wingetmenu
-cls
-%print% SELECT WHAT TO INSTALL:
-echo.
+cls & %print% SELECT WHAT TO INSTALL: & echo.
 echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox
 echo: [4] Chrome                      [5] Notepad++                   [6] Discord
 echo: [7] Parsec                      [8] Steam                       [9] Epic Games Launcher
@@ -233,7 +267,8 @@ echo: [22] VLC                        [23] Cloudflare Warp
 echo %breakline% & %print% [*] CREATE FILE & echo [0] GO BACK
 if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type selected-apps.txt 2>nul
 
-set "symbol=Error" & echo. & set /p "symbol=ENTER THE SYMBOL: "
+set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
+if %symbol%==0 goto :menu
 if %symbol%==1 goto :C++Redist
 if %symbol%==2 goto :7zip
 if %symbol%==3 goto :Firefox
@@ -258,7 +293,6 @@ if %symbol%==21 goto :Zoom
 if %symbol%==22 goto :VLC
 if %symbol%==23 goto :CloudflareWarp
 if %symbol%==* goto :endofthewingetfile
-if %symbol%==0 goto :menu
 if %symbol%==/ call :delete & goto :startofthewingetfile
 goto :wingetmenu
 
@@ -507,5 +541,4 @@ pause & goto :menu
 
 :delete
 if exist winget.json del winget.json 2>nul & del selected-apps.txt 2>nul & rmdir /s /q %Temp%\WinGet\ 2>nul 
-if exist settings.reg del settings.reg 2>nul
 goto :eof
