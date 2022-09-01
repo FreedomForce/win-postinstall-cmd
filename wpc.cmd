@@ -104,7 +104,7 @@ if %symbol%==23 call :disable_windowsexperience >nul 2>&1
 if %symbol%==24 call :disable_tipsandsuggestions >nul 2>&1
 if %symbol%==25 call :enable_numlock >nul 2>&1
 if %symbol%==26 call :disable_easeofaccesssettings >nul 2>&1
-if %symbol%==27 call :enable_checkboxes
+if %symbol%==27 call :enable_checkboxes >nul 2>&1
 goto :registry
 
 :rm_chat
