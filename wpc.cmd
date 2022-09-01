@@ -37,22 +37,18 @@ if %number%==5 goto :open_oldmixer
 goto :tweaks
 
 :update_winget
-%print% CHECK IF WINGET IS INSTALLED
 start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
 goto :tweaks
 
 :update_windows
-%print% CHECK FOR UPDATES
 start ms-settings:windowsupdate-action
 goto :tweaks
 
 :disable_hibernate
-%print% DISABLE HIBERNATE
 echo. & powercfg /h off && powercfg /a |more
 pause & goto :tweaks
 
 :disable_passwordexp
-%print% DISABLE PASSWORD EXPIRATION
 echo. & wmic UserAccount where "Name='%username%'" set PasswordExpires=False
 pause & goto :tweaks
 
@@ -76,6 +72,7 @@ echo: [19] Disable "use my sign in info after restart"         [20] Alt tab open
 echo: [21] Restore the classic context menu                    [22] Disable "Suggest ways to get the most out of Windows..."
 echo: [23] Disable "Windows Experience ..."                    [24] Disable "Get tips and suggestions when using Windows"
 echo: [25] Enable NumLock by default                           [26] Disable ease of access settings (Narrator + Sticky Keys)
+echo: [27] Enable file explorer checkboxes
 %print% [0] GO BACK & echo [*] SELECT ALL
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
@@ -107,6 +104,7 @@ if %symbol%==23 call :disable_windowsexperience >nul 2>&1
 if %symbol%==24 call :disable_tipsandsuggestions >nul 2>&1
 if %symbol%==25 call :enable_numlock >nul 2>&1
 if %symbol%==26 call :disable_easeofaccesssettings >nul 2>&1
+if %symbol%==27 call :enable_checkboxes
 goto :registry
 
 :rm_chat
@@ -251,6 +249,11 @@ reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys" /f /v Flags /
 reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys" /f /v Flags /t REG_DWORD /d 34
 goto :eof
 
+:enable_checkboxes
+rem          Enable file explorer checkboxes
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
+goto :eof
+
 :registry_allkeys
 call :rm_chat >nul 2>&1
 call :rm_cortana_icon >nul 2>&1
@@ -278,6 +281,7 @@ call :disable_windowsexperience >nul 2>&1
 call :disable_tipsandsuggestions >nul 2>&1
 call :enable_numlock >nul 2>&1
 call :disable_easeofaccesssettings >nul 2>&1
+call :enable_checkboxes >nul 2>&1
 goto :registry
 
 rem                     THIRD CHAPTER - WINGET
@@ -293,7 +297,8 @@ echo: [10] Ubisoft Connect            [11] Microsoft Teams            [12] OBS S
 echo: [13] Zero Tier One              [14] qBittorrent                [15] Sandboxie Plus
 echo: [16] Viber                      [17] Java                       [18] PowerToys
 echo: [19] KeePass                    [20] Malwarebytes               [21] Zoom
-echo: [22] VLC                        [23] Cloudflare Warp
+echo: [22] VLC                        [23] Cloudflare Warp            [24] Chocolatey GUI
+echo: [25] .NET Framework
 %print% [*] CREATE FILE & echo [0] GO BACK
 if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type selected-apps.txt 2>nul
 
@@ -322,6 +327,8 @@ if %symbol%==20 goto :Malwarebytes
 if %symbol%==21 goto :Zoom
 if %symbol%==22 goto :VLC
 if %symbol%==23 goto :CloudflareWarp
+if %symbol%==24 goto :ChocolateyGUI
+if %symbol%==25 goto :dotNetFramework
 if %symbol%==* goto :endofthewingetfile
 if %symbol%==/ call :delete & goto :startofthewingetfile
 goto :wingetmenu
@@ -329,7 +336,7 @@ goto :wingetmenu
 :startofthewingetfile
 echo {>> winget.json
 echo    "$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> winget.json
-echo    "CreationDate" : "2022-08",>> winget.json
+echo    "CreationDate" : "2022-09",>> winget.json
 echo    "Sources" : >> winget.json
 echo    [>> winget.json
 echo        {>> winget.json
@@ -339,216 +346,198 @@ goto :wingetmenu
 
 :C++Redist
 if exist selected-apps.txt find /c "C++ Redistributable added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2015-2022Redist-x64">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2015-2019Redist-x86">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2013Redist-x86">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2013Redist-x64">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2012Redist-x86">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2012Redist-x64">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2010Redist-x86">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2008Redist-x86">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2008Redist-x64">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2005Redist-x86">> winget.json
-echo                },>> winget.json
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.VC++2005Redist-x64">> winget.json
-echo                },>> winget.json
+set wingetapp=Microsoft.VC++2015-2022Redist-x64
+call :winget_app
+set wingetapp=Microsoft.VC++2015-2019Redist-x86
+call :winget_app
+set wingetapp=Microsoft.VC++2013Redist-x86
+call :winget_app
+set wingetapp=Microsoft.VC++2013Redist-x64
+call :winget_app
+set wingetapp=Microsoft.VC++2012Redist-x86
+call :winget_app
+set wingetapp=Microsoft.VC++2012Redist-x64
+call :winget_app
+set wingetapp=Microsoft.VC++2010Redist-x86
+call :winget_app
+set wingetapp=Microsoft.VC++2008Redist-x86
+call :winget_app
+set wingetapp=Microsoft.VC++2008Redist-x64
+call :winget_app
+set wingetapp=Microsoft.VC++2005Redist-x86
+call :winget_app
+set wingetapp=Microsoft.VC++2005Redist-x64
+call :winget_app
 echo C++ Redistributable added>> selected-apps.txt
 goto :wingetmenu
 
 :7zip
 if exist selected-apps.txt find /c "7zip added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "7zip.7zip">> winget.json
-echo                },>> winget.json
+set wingetapp=7zip.7zip
+call :winget_app
 echo 7zip added>> selected-apps.txt
 goto :wingetmenu
 
 :Firefox
 if exist selected-apps.txt find /c "Firefox added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Mozilla.Firefox.ESR">> winget.json
-echo                },>> winget.json
+set wingetapp=Mozilla.Firefox.ESR
+call :winget_app
 echo Firefox added>> selected-apps.txt
 goto :wingetmenu
 
 :Chrome
 if exist selected-apps.txt find /c "Chrome added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Google.Chrome">> winget.json
-echo                },>> winget.json
+set wingetapp=Google.Chrome
+call :winget_app
 echo Chrome added>> selected-apps.txt
 goto :wingetmenu
 
 :Notepad++
 if exist selected-apps.txt find /c "Notepad++ added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Notepad++.Notepad++">> winget.json
-echo                },>> winget.json
+set wingetapp=Notepad++.Notepad++
+call :winget_app
 echo Notepad++ added>> selected-apps.txt
 goto :wingetmenu
 
 :Discord
 if exist selected-apps.txt find /c "Discord added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Discord.Discord">> winget.json
-echo                },>> winget.json
+set wingetapp=Discord.Discord
+call :winget_app
 echo Discord added>> selected-apps.txt
 goto :wingetmenu
 
 :Parsec
 if exist selected-apps.txt find /c "Parsec added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Parsec.Parsec">> winget.json
-echo                },>> winget.json
+set wingetapp=Parsec.Parsec
+call :winget_app
 echo Parsec added>> selected-apps.txt
 goto :wingetmenu
 
 :Steam
 if exist selected-apps.txt find /c "Steam added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Valve.Steam">> winget.json
-echo                },>> winget.json
+set wingetapp=Valve.Steam
+call :winget_app
 echo Steam added>> selected-apps.txt
 goto :wingetmenu
 
 :EpicGamesLauncher
 if exist selected-apps.txt find /c "Epic Games Launcher added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "EpicGames.EpicGamesLauncher">> winget.json
-echo                },>> winget.json
+set wingetapp=EpicGames.EpicGamesLauncher
+call :winget_app
 echo Epic Games Launcher added>> selected-apps.txt
 goto :wingetmenu
 
 :Ubisoft
 if exist selected-apps.txt find /c "Ubisoft Connect added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Ubisoft.Connect">> winget.json
-echo                },>> winget.json
+set wingetapp=Ubisoft.Connect
+call :winget_app
 echo Ubisoft Connect added>> selected-apps.txt
 goto :wingetmenu
 
 :MicrosoftTeams
 if exist selected-apps.txt find /c "Microsoft Teams added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.Teams">> winget.json
-echo                },>> winget.json
+set wingetapp=Microsoft.Teams
+call :winget_app
 echo Microsoft Teams added>> selected-apps.txt
 goto :wingetmenu
 
 :OBSStudio
 if exist selected-apps.txt find /c "OBS Studio added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "OBSProject.OBSStudio">> winget.json
-echo                },>> winget.json
+set wingetapp=OBSProject.OBSStudio
+call :winget_app
 echo OBS Studio added>> selected-apps.txt
 goto :wingetmenu
 
 :ZeroTierOne
 if exist selected-apps.txt find /c "Zero Tier One added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "ZeroTier.ZeroTierOne">> winget.json
-echo                },>> winget.json
+set wingetapp=ZeroTier.ZeroTierOne
+call :winget_app
 echo Zero Tier One added>> selected-apps.txt
 goto :wingetmenu
 
 :qBittorrent
 if exist selected-apps.txt find /c "qBittorrent added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "qBittorrent.qBittorrent">> winget.json
-echo                },>> winget.json
+set wingetapp=qBittorrent.qBittorrent
+call :winget_app
 echo qBittorrent added>> selected-apps.txt
 goto :wingetmenu
 
 :SandboxiePlus
 if exist selected-apps.txt find /c "Sandboxie Plus added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Sandboxie.Plus">> winget.json
-echo                },>> winget.json
+set wingetapp=Sandboxie.Plus
+call :winget_app
 echo Sandboxie Plus added>> selected-apps.txt
 goto :wingetmenu
 
 :Viber
 if exist selected-apps.txt find /c "Viber added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Viber.Viber">> winget.json
-echo                },>> winget.json
+set wingetapp=Viber.Viber
+call :winget_app
 echo Viber added>> selected-apps.txt
 goto :wingetmenu
 
 :Java
 if exist selected-apps.txt find /c "Java added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Oracle.JavaRuntimeEnvironment">> winget.json
-echo                },>> winget.json
+set wingetapp=Oracle.JavaRuntimeEnvironment
+call :winget_app
 echo Java added>> selected-apps.txt
 goto :wingetmenu
 
 :PowerToys
 if exist selected-apps.txt find /c "PowerToys added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Microsoft.PowerToys">> winget.json
-echo                },>> winget.json
+set wingetapp=Microsoft.PowerToys
+call :winget_app
 echo PowerToys added>> selected-apps.txt
 goto :wingetmenu
 
 :KeePass
 if exist selected-apps.txt find /c "KeePass added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "DominikReichl.KeePass">> winget.json
-echo                },>> winget.json
+set wingetapp=DominikReichl.KeePass
+call :winget_app
 echo KeePass added>> selected-apps.txt
 goto :wingetmenu
 
 :Malwarebytes
 if exist selected-apps.txt find /c "Malwarebytes added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Malwarebytes.Malwarebytes">> winget.json
-echo                },>> winget.json
+set wingetapp=Malwarebytes.Malwarebytes
+call :winget_app
 echo Malwarebytes added>> selected-apps.txt
 goto :wingetmenu
 
 :Zoom
 if exist selected-apps.txt find /c "Zoom added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Zoom.Zoom">> winget.json
-echo                },>> winget.json
+set wingetapp=Zoom.Zoom
+call :winget_app
 echo Zoom added>> selected-apps.txt
 goto :wingetmenu
 
 :VLC
 if exist selected-apps.txt find /c "VLC added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "VideoLAN.VLC">> winget.json
-echo                },>> winget.json
+set wingetapp=VideoLAN.VLC
+call :winget_app
 echo VLC added>> selected-apps.txt
 goto :wingetmenu
 
 :CloudflareWarp
 if exist selected-apps.txt find /c "Cloudflare Warp added" selected-apps.txt >nul && goto :wingetmenu
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "Cloudflare.Warp">> winget.json
-echo                },>> winget.json
+set wingetapp=Cloudflare.Warp
+call :winget_app
 echo Cloudflare Warp added>> selected-apps.txt
+goto :wingetmenu
+
+:ChocolateyGUI
+if exist selected-apps.txt find /c "Chocolatey added" selected-apps.txt >nul && goto :wingetmenu
+powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+set wingetapp=Chocolatey.ChocolateyGUI
+call :winget_app
+echo Chocolatey added>> selected-apps.txt
+goto :wingetmenu
+
+:dotNetFramework
+if exist selected-apps.txt find /c ".NET Framework added" selected-apps.txt >nul && goto :wingetmenu
+set wingetapp=Microsoft.dotNetFramework
+call :winget_app
+echo .NET Framework added>> selected-apps.txt
 goto :wingetmenu
 
 :endofthewingetfile
@@ -564,10 +553,15 @@ echo        }>> winget.json
 echo    ]>> winget.json
 echo }>> winget.json
 
-echo %breakline% & %print% FILE CREATED & pause
-echo %breakline% & %print% WINGET.JSON INITIALIZATION
+echo %breakline% & %print% FILE CREATED. PRESS ANY KEY TO INITIALIZE WINGET.JSON & pause
 winget import -i .\winget.json --accept-source-agreements --accept-package-agreements
 pause & goto :menu
+
+:winget_app
+echo                {>> winget.json
+echo                    "PackageIdentifier" : "%wingetapp%">> winget.json
+echo                },>> winget.json
+goto :eof
 
 :delete
 if exist winget.json del winget.json 2>nul & del selected-apps.txt 2>nul & rmdir /s /q %Temp%\WinGet\ 2>nul 
