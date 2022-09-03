@@ -68,11 +68,11 @@ echo: [11] Disable "Show recently opened items in Start..."    [12] Disable Comp
 echo: [13] Open file explorer to This PC                       [14] Show file name extensions
 echo: [15] Sound communications do nothing                     [16] Disable startup sound 
 echo: [17] Turn off enhance pointer precision                  [18] Disable automatic maintenance
-echo: [19] Disable "use my sign in info after restart"         [20] Alt tab open windows only
+echo: [19] Disable "Use my sign in info after restart"         [20] Alt tab open windows only
 echo: [21] Restore the classic context menu                    [22] Disable "Suggest ways to get the most out of Windows..."
 echo: [23] Disable "Windows Experience ..."                    [24] Disable "Get tips and suggestions when using Windows"
 echo: [25] Enable NumLock by default                           [26] Disable ease of access settings (Narrator + Sticky Keys)
-echo: [27] Enable file explorer checkboxes
+echo: [27] Enable file explorer checkboxes                     [28] Let me use a different input method for each app window
 %print% [0] GO BACK & echo [*] SELECT ALL
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
@@ -105,6 +105,7 @@ if %symbol%==24 call :disable_tipsandsuggestions >nul 2>&1
 if %symbol%==25 call :enable_numlock >nul 2>&1
 if %symbol%==26 call :disable_easeofaccesssettings >nul 2>&1
 if %symbol%==27 call :enable_checkboxes >nul 2>&1
+if %symbol%==28 call :enable_differentinputmethod >nul 2>&1
 goto :registry
 
 :rm_chat
@@ -254,6 +255,11 @@ rem          Enable file explorer checkboxes
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
 goto :eof
 
+:enable_differentinputmethod
+rem          Let me use a different input method for each app window
+reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e068092000000
+goto :eof
+
 :registry_allkeys
 call :rm_chat >nul 2>&1
 call :rm_cortana_icon >nul 2>&1
@@ -282,6 +288,7 @@ call :disable_tipsandsuggestions >nul 2>&1
 call :enable_numlock >nul 2>&1
 call :disable_easeofaccesssettings >nul 2>&1
 call :enable_checkboxes >nul 2>&1
+call :enable_differentinputmethod >nul 2>&1
 goto :registry
 
 rem                     THIRD CHAPTER - WINGET
@@ -525,12 +532,21 @@ call :winget_app
 echo Cloudflare Warp added>> selected-apps.txt
 goto :wingetmenu
 
+:Chocolatey
+echo LAUNCHING CHOCOLATEY INSTALLATION SCRIPT
+powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) 
+goto :ChocolateyGUIcontinue
+
 :ChocolateyGUI
-if exist selected-apps.txt find /c "Chocolatey added" selected-apps.txt >nul && goto :wingetmenu
-powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choice /n /m "HAVE YOU ALREADY INSTALLED CHOCOLATEY? [Y/N]"
+if errorlevel 2 goto :Chocolatey
+if errorlevel 1 goto :ChocolateyGUIcontinue
+
+:ChocolateyGUIcontinue
+if exist selected-apps.txt find /c "Chocolatey GUI added" selected-apps.txt >nul && goto :wingetmenu
 set wingetapp=Chocolatey.ChocolateyGUI
 call :winget_app
-echo Chocolatey added>> selected-apps.txt
+echo Chocolatey GUI added>> selected-apps.txt
 goto :wingetmenu
 
 :dotNetFramework
