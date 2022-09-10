@@ -1,5 +1,6 @@
 @echo off
-title win-postinstall-cmd                         
+mode con: cols=145 lines=30
+title win-postinstall-cmd
 cd /d %~dp0
 set breakline=------------------------------------------------------------------------------------------
 set "print=echo. & echo"
@@ -32,8 +33,8 @@ if %number%==0 goto :menu
 if %number%==1 goto :update_winget
 if %number%==2 goto :update_windows
 if %number%==3 goto :disable_hibernate
-if %number%==4 goto :disable_passwordexp
-if %number%==5 goto :open_oldmixer
+if %number%==4 goto :disable_passwordExp
+if %number%==5 goto :open_oldMixer
 goto :tweaks
 
 :update_winget
@@ -48,248 +49,464 @@ goto :tweaks
 echo. & powercfg /h off && powercfg /a |more
 pause & goto :tweaks
 
-:disable_passwordexp
+:disable_passwordExp
 echo. & wmic UserAccount where "Name='%username%'" set PasswordExpires=False
 pause & goto :tweaks
 
-:open_oldmixer
+:open_oldMixer
 sndvol.exe
 goto :tweaks
 
 rem                     SECOND CHAPTER - REGISTRY KEYS
 :registry
 cls & %print% SELECT YOUR TASK: & echo.
-echo: [1] Remove chat from taskbar                             [2] Remove Cortana from taskbar 
-echo: [3] Remove task view from taskbar                        [4] Remove search from taskbar
-echo: [5] Remove meet now                                      [6] Remove news and interests
-echo: [7] Remove taskbar pins                                  [8] Remove Widgets from the Taskbar
-echo: [9] Always hide most used list in start menu             [10] Disable show recently added apps
-echo: [11] Disable "Show recently opened items in Start..."    [12] Disable Compact Mode
-echo: [13] Open file explorer to This PC                       [14] Show file name extensions
-echo: [15] Sound communications do nothing                     [16] Disable startup sound 
-echo: [17] Turn off enhance pointer precision                  [18] Disable automatic maintenance
-echo: [19] Disable "Use my sign in info after restart"         [20] Alt tab open windows only
-echo: [21] Restore the classic context menu                    [22] Disable "Suggest ways to get the most out of Windows..."
-echo: [23] Disable "Windows Experience ..."                    [24] Disable "Get tips and suggestions when using Windows"
-echo: [25] Enable NumLock by default                           [26] Disable ease of access settings (Narrator + Sticky Keys)
-echo: [27] Enable file explorer checkboxes                     [28] Let me use a different input method for each app window
-%print% [0] GO BACK & echo [*] SELECT ALL
+echo: [11] Remove chat from taskbar                             [21] Remove Cortana from taskbar 
+echo: [12] Remove task view from taskbar                        [22] Remove search from taskbar
+echo: [13] Remove meet now                                      [23] Remove news and interests
+echo: [14] Remove taskbar pins                                  [24] Remove Widgets from the Taskbar
+echo: [15] Always hide most used list in start menu             [25] Disable show recently added apps
+echo: [16] Disable "Show recently opened items in Start..."     [26] Enable Compact Mode
+echo: [17] Open file explorer to - This PC                      [27] Show file name extensions
+echo: [18] Sound communications - do nothing                    [28] Disable startup sound 
+echo: [19] Turn off enhance pointer precision                   [29] Disable automatic maintenance
+echo: [101] Disable "Use my sign in info after restart"         [201] Alt tab - open windows only
+echo: [102] Restore the classic context menu                    [202] Disable "Suggest ways to get the most out of Windows..."
+echo: [103] Disable "Windows Experience ..."                    [203] Disable "Get tips and suggestions when using Windows"
+echo: [104] Enable NumLock by default                           [204] Disable ease of access settings (Narrator + Sticky Keys)
+echo: [105] Enable file explorer checkboxes                     [205] Enable "Let me use a different input method for each app window"
+%print% [0] GO BACK & echo [*] SELECT ALL & echo [/] RESTORE SETTINGS
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
-if %symbol%==* call :registry_allkeys
-if %symbol%==0 call :menu
-if %symbol%==1 call :rm_chat >nul 2>&1
-if %symbol%==2 call :rm_cortana_icon >nul 2>&1
-if %symbol%==3 call :rm_taskview_icon >nul 2>&1
-if %symbol%==4 call :rm_search_icon >nul 2>&1
-if %symbol%==5 call :rm_meet_icon >nul 2>&1
-if %symbol%==6 call :rm_newsandinterests_icon >nul 2>&1
-if %symbol%==7 call :rm_taskbarpins >nul 2>&1
-if %symbol%==8 call :rm_widgetsfromthetaskbar_icon >nul 2>&1
-if %symbol%==9 call :hide_mostusedlist >nul 2>&1
-if %symbol%==10 call :disable_showrecentlyaddedapps >nul 2>&1
-if %symbol%==11 call :disable_showrecentlyopened >nul 2>&1
-if %symbol%==12 call :disable_compactmode >nul 2>&1
-if %symbol%==13 call :enable_openfileexplorer >nul 2>&1
-if %symbol%==14 call :enable_filenameextensions >nul 2>&1
-if %symbol%==15 call :enable_soundcommunications >nul 2>&1
-if %symbol%==16 call :disable_startupsound >nul 2>&1
-if %symbol%==17 call :disable_enhancepointerprecision >nul 2>&1
-if %symbol%==18 call :disable_automaticmaintenance >nul 2>&1
-if %symbol%==19 call :disable_usemysignininfo >nul 2>&1
-if %symbol%==20 call :enable_alttabopenwindowsonly >nul 2>&1
-if %symbol%==21 call :enable_classiccontextmenu >nul 2>&1
-if %symbol%==22 call :disable_suggestways >nul 2>&1
-if %symbol%==23 call :disable_windowsexperience >nul 2>&1
-if %symbol%==24 call :disable_tipsandsuggestions >nul 2>&1
-if %symbol%==25 call :enable_numlock >nul 2>&1
-if %symbol%==26 call :disable_easeofaccesssettings >nul 2>&1
-if %symbol%==27 call :enable_checkboxes >nul 2>&1
-if %symbol%==28 call :enable_differentinputmethod >nul 2>&1
+if %symbol%==/   goto :registry_restore
+if %symbol%==*   call :registry_all_keys
+if %symbol%==0   call :menu
+if %symbol%==11  call :import_chat                       >nul 2>&1
+if %symbol%==21  call :import_cortana_icon               >nul 2>&1
+if %symbol%==12  call :import_TaskView_icon              >nul 2>&1
+if %symbol%==22  call :import_search_icon                >nul 2>&1
+if %symbol%==13  call :import_meet_icon                  >nul 2>&1
+if %symbol%==23  call :import_NewsAndInterests_icon      >nul 2>&1
+if %symbol%==14  call :import_TaskbarPins                >nul 2>&1
+if %symbol%==24  call :import_WidgetsFromTheTaskbar_icon >nul 2>&1
+if %symbol%==15  call :import_MostUsedList               >nul 2>&1
+if %symbol%==25  call :import_ShowRecentlyAddedApps      >nul 2>&1
+if %symbol%==16  call :import_ShowRecentlyOpened         >nul 2>&1
+if %symbol%==26  call :import_CompactMode                >nul 2>&1
+if %symbol%==17  call :import_OpenFileExplorer           >nul 2>&1
+if %symbol%==27  call :import_FileNameExtensions         >nul 2>&1
+if %symbol%==18  call :import_SoundCommunications        >nul 2>&1
+if %symbol%==28  call :import_StartupSound               >nul 2>&1
+if %symbol%==19  call :import_EnhancePointerPrecision    >nul 2>&1
+if %symbol%==29  call :import_AutomaticMaintenance       >nul 2>&1
+if %symbol%==101 call :import_UseMySignInInfo            >nul 2>&1
+if %symbol%==201 call :import_AltTab                     >nul 2>&1
+if %symbol%==102 call :import_ClassicContextMenu         >nul 2>&1
+if %symbol%==202 call :import_SuggestWays                >nul 2>&1
+if %symbol%==103 call :import_WindowsExperience          >nul 2>&1
+if %symbol%==203 call :import_TipsAndSuggestions         >nul 2>&1
+if %symbol%==104 call :import_NumLock                    >nul 2>&1
+if %symbol%==204 call :import_EaseOfAccessSettings       >nul 2>&1
+if %symbol%==105 call :import_CheckBoxes                 >nul 2>&1
+if %symbol%==205 call :import_DifferentInputMethod       >nul 2>&1
 goto :registry
 
-:rm_chat
+:import_chat
 rem          Remove chat from taskbar
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarMn /t REG_DWORD /d 00000000
 goto :eof
 
-:rm_cortana_icon
+:import_cortana_icon
 rem          Remove Cortana from taskbar
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v ShowCortanaButton /t REG_DWORD /d 00000000
 goto :eof
 
-:rm_taskview_icon
+:import_TaskView_icon
 rem          Remove task view from taskbar
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v ShowTaskViewButton /t REG_DWORD /d 00000000
 goto :eof
 
-:rm_search_icon
+:import_search_icon
 rem          Remove search from taskbar
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search" /f /v SearchboxTaskbarMode /t REG_DWORD /d 00000000
 goto :eof
 
-:rm_meet_icon
+:import_meet_icon
 rem          Remove meet now
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideSCAMeetNow /t REG_DWORD /d 00000001
 goto :eof
 
-:rm_newsandinterests_icon
+:import_NewsAndInterests_icon
 rem          Remove news and interests
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds /t REG_DWORD /d 00000000
 goto :eof
 
-:rm_taskbarpins
+:import_TaskbarPins
 rem          Remove taskbar pins
 reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /f /va
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband\AuxilliaryPins" /f
 goto :eof
 
-:rm_widgetsfromthetaskbar_icon
+:import_WidgetsFromTheTaskbar_icon
 rem          Remove Widgets from the Taskbar
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarDa /t REG_DWORD /d 00000000
 goto :eof
 
-:hide_mostusedlist
+:import_MostUsedList
 rem          Always hide most used list in start menu
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002
-reg delete "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation
 goto :eof
 
-:disable_showrecentlyaddedapps
+:import_ShowRecentlyAddedApps
 rem          Disable show recently added apps
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
 goto :eof
 
-:disable_showrecentlyopened
+:import_ShowRecentlyOpened
 rem          Disable show recently opened items in start, jump lists and file explorer
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v Start_TrackDocs /t REG_DWORD /d 00000000
 goto :eof
 
-:disable_compactmode
-rem          Disable Compact Mode
+:import_CompactMode
+rem          Enable Compact Mode
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v UseCompactMode /t REG_DWORD /d 00000001
 goto :eof
 
-:enable_openfileexplorer
+:import_OpenFileExplorer
 rem          Open file explorer to this pc
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v LaunchTo /t REG_DWORD /d 00000001
 goto :eof
 
-:enable_filenameextensions
+:import_FileNameExtensions
 rem          Show file name extensions
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v HideFileExt /t REG_DWORD /d 00000000
 goto :eof
 
-:enable_soundcommunications
+:import_SoundCommunications
 rem          Sound communications do nothing
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Multimedia\Audio" /f /v UserDuckingPreference /t REG_DWORD /d 00000003
 goto :eof
 
-:disable_startupsound
+:import_StartupSound
 rem          Disable startup sound
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation" /f /v DisableStartupSound /t REG_DWORD /d 00000001
 goto :eof
 
-:disable_enhancepointerprecision
+:import_EnhancePointerPrecision
 rem          Turn off enhance pointer precision
-reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseSpeed /t REG_DWORD /d 0
-reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold1 /t REG_DWORD /d 0
-reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold2 /t REG_DWORD /d 0
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseSpeed /t REG_SZ /d 0
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold1 /t REG_SZ /d 0
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold2 /t REG_SZ /d 0
 goto :eof
 
-:disable_automaticmaintenance
+:import_AutomaticMaintenance
 rem          Disable automatic maintenance
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /f /v MaintenanceDisabled /t REG_DWORD /d 00000001
 goto :eof
 
-:disable_usemysignininfo
+:import_UseMySignInInfo
 rem          Disable use my sign in info after restart
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v DisableAutomaticRestartSignOn /t REG_DWORD /d 00000001
 goto :eof
 
-:enable_alttabopenwindowsonly
+:import_AltTab
 rem          Alt tab open windows only
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v MultiTaskingAltTabFilter /t REG_DWORD /d 00000003
 goto :eof
 
-:enable_classiccontextmenu
-rem          Restore the classic context menu 4 w11
+:import_ClassicContextMenu
+rem          Restore the classic context menu
 reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
 goto :eof
 
-:disable_suggestways
+:import_SuggestWays
 rem          Disable "Suggest ways to get the most out of Windows and finish setting up this device"
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /f /v ScoobeSystemSettingEnabled /t REG_DWORD /d 00000000
 goto :eof
 
-:disable_windowsexperience
-rem          Disable "Windows Experience ..."
+:import_WindowsExperience
+rem          Disable "Windows Experience..."
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-310093Enabled /t REG_DWORD /d 00000000
 goto :eof
 
-:disable_tipsandsuggestions
+:import_TipsAndSuggestions
 rem          Disable "Get tips and suggestions when using Windows"
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338389Enabled /t REG_DWORD /d 00000000
 goto :eof
 
-:enable_numlock
+:import_NumLock
 rem          Enable NumLock by default
-reg add "HKEY_USERS\.DEFAULT\Control Panel\Keyboard" /f /v InitialKeyboardIndicators /t REG_DWORD /d 2147483650
+reg add "HKEY_USERS\.DEFAULT\Control Panel\Keyboard" /f /v InitialKeyboardIndicators /t REG_SZ /d 2147483650
 goto :eof
 
-:disable_easeofaccesssettings
+:import_EaseOfAccessSettings
 rem          Disable ease of access settings
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /v selfvoice /t REG_DWORD /d 00000000
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /v selfscan /t REG_DWORD /d 00000000
-reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys" /f /v Flags /t REG_DWORD /d 2
-reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys" /f /v Flags /t REG_DWORD /d 34
+reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys" /f /v Flags /t REG_SZ /d 2
+reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys" /f /v Flags /t REG_SZ /d 34
 goto :eof
 
-:enable_checkboxes
+:import_CheckBoxes
 rem          Enable file explorer checkboxes
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
 goto :eof
 
-:enable_differentinputmethod
+:import_DifferentInputMethod
 rem          Let me use a different input method for each app window
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e068092000000
 goto :eof
 
-:registry_allkeys
-call :rm_chat >nul 2>&1
-call :rm_cortana_icon >nul 2>&1
-call :rm_taskview_icon >nul 2>&1
-call :rm_search_icon >nul 2>&1
-call :rm_meet_icon >nul 2>&1
-call :rm_newsandinterests_icon >nul 2>&1
-call :rm_taskbarpins >nul 2>&1
-call :rm_widgetsfromthetaskbar_icon >nul 2>&1
-call :hide_mostusedlist >nul 2>&1
-call :disable_showrecentlyaddedapps >nul 2>&1
-call :disable_showrecentlyopened >nul 2>&1
-call :disable_compactmode >nul 2>&1
-call :enable_openfileexplorer >nul 2>&1
-call :enable_filenameextensions >nul 2>&1
-call :enable_soundcommunications >nul 2>&1
-call :disable_startupsound >nul 2>&1
-call :disable_enhancepointerprecision >nul 2>&1
-call :disable_automaticmaintenance >nul 2>&1
-call :disable_usemysignininfo >nul 2>&1
-call :enable_alttabopenwindowsonly >nul 2>&1
-call :enable_classiccontextmenu >nul 2>&1
-call :disable_suggestways >nul 2>&1
-call :disable_windowsexperience >nul 2>&1
-call :disable_tipsandsuggestions >nul 2>&1
-call :enable_numlock >nul 2>&1
-call :disable_easeofaccesssettings >nul 2>&1
-call :enable_checkboxes >nul 2>&1
-call :enable_differentinputmethod >nul 2>&1
+:registry_all_keys
+call :import_chat                       >nul 2>&1
+call :import_cortana_icon               >nul 2>&1
+call :import_TaskView_icon              >nul 2>&1
+call :import_search_icon                >nul 2>&1
+call :import_meet_icon                  >nul 2>&1
+call :import_NewsAndInterests_icon      >nul 2>&1
+call :import_TaskbarPins                >nul 2>&1
+call :import_WidgetsFromTheTaskbar_icon >nul 2>&1
+call :import_MostUsedList               >nul 2>&1
+call :import_ShowRecentlyAddedApps      >nul 2>&1
+call :import_ShowRecentlyOpened         >nul 2>&1
+call :import_CompactMode                >nul 2>&1
+call :import_OpenFileExplorer           >nul 2>&1
+call :import_FileNameExtensions         >nul 2>&1
+call :import_SoundCommunications        >nul 2>&1
+call :import_StartupSound               >nul 2>&1
+call :import_EnhancePointerPrecision    >nul 2>&1
+call :import_AutomaticMaintenance       >nul 2>&1
+call :import_UseMySignInInfo            >nul 2>&1
+call :import_AltTab                     >nul 2>&1
+call :import_ClassicContextMenu         >nul 2>&1
+call :import_SuggestWays                >nul 2>&1
+call :import_WindowsExperience          >nul 2>&1
+call :import_TipsAndSuggestions         >nul 2>&1
+call :import_NumLock                    >nul 2>&1
+call :import_EaseOfAccessSettings       >nul 2>&1
+call :import_CheckBoxes                 >nul 2>&1
+call :import_DifferentInputMethod       >nul 2>&1
 goto :registry
+
+:registry_restore
+cls & %print% SELECT YOUR TASK: & echo.
+echo: [11] Restore chat on taskbar                                               [21] Restore Cortana on taskbar 
+echo: [12] Restore task view on taskbar                                          [22] Restore search on taskbar
+echo: [13] Restore meet now                                                      [23] Restore news and interests
+echo: [14] Restore Widgets on the Taskbar                                        [24] Disable "Always hide most used list in start menu"
+echo: [15] Enable show recently added apps                                       [25] Enable "Show recently opened items in Start..."
+echo: [16] Disable Compact Mode                                                  [26] Open file explorer to - Quick access
+echo: [17] Disable Show file name extensions                                     [27] Restore Sound communications tab
+echo: [18] Enable startup sound                                                  [28] Restore enhance pointer precision
+echo: [19] Enable automatic maintenance                                          [29] Enable "Use my sign in info after restart"
+echo: [101] Alt tab open - Open windows and 5 most recent...                     [201] Disable the classic context menu
+echo: [102] Enable "Suggest ways to get the most out of Windows..."              [202] Enable "Windows Experience ..."
+echo: [103] Enable "Get tips and suggestions when using Windows"                 [203] Disable NumLock by default
+echo: [104] Enable ease of access settings (Narrator + Sticky Keys)              [204] Disable file explorer checkboxes
+echo: [105] Disable "Let me use a different input method for each app window"
+%print% [0] GO BACK & echo [*] SELECT ALL
+
+set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
+if %symbol%==*   goto :registry_restore_all_keys
+if %symbol%==0   goto :registry
+if %symbol%==11  call :restore_chat                       >nul 2>&1
+if %symbol%==21  call :restore_cortana_icon               >nul 2>&1
+if %symbol%==12  call :restore_TaskView_icon              >nul 2>&1
+if %symbol%==22  call :restore_search_icon                >nul 2>&1
+if %symbol%==13  call :restore_meet_icon                  >nul 2>&1
+if %symbol%==23  call :restore_NewsAndInterests_icon      >nul 2>&1
+if %symbol%==14  call :restore_WidgetsFromTheTaskbar_icon >nul 2>&1
+if %symbol%==24  call :restore_MostUsedList               >nul 2>&1
+if %symbol%==15  call :restore_ShowRecentlyAddedApps      >nul 2>&1
+if %symbol%==25  call :restore_ShowRecentlyOpened         >nul 2>&1
+if %symbol%==16  call :restore_CompactMode                >nul 2>&1
+if %symbol%==26  call :restore_OpenFileExplorer           >nul 2>&1
+if %symbol%==17  call :restore_FileNameExtensions         >nul 2>&1
+if %symbol%==27  call :restore_SoundCommunications        >nul 2>&1
+if %symbol%==18  call :restore_StartupSound               >nul 2>&1
+if %symbol%==28  call :restore_EnhancePointerPrecision    >nul 2>&1
+if %symbol%==19  call :restore_AutomaticMaintenance       >nul 2>&1
+if %symbol%==29  call :restore_UseMySignInInfo            >nul 2>&1
+if %symbol%==101 call :restore_AltTab                     >nul 2>&1
+if %symbol%==201 call :restore_ClassicContextMenu         >nul 2>&1
+if %symbol%==102 call :restore_SuggestWays                >nul 2>&1
+if %symbol%==202 call :restore_WindowsExperience          >nul 2>&1
+if %symbol%==103 call :restore_TipsAndSuggestions         >nul 2>&1
+if %symbol%==203 call :restore_NumLock                    >nul 2>&1
+if %symbol%==104 call :restore_EaseOfAccessSettings       >nul 2>&1
+if %symbol%==204 call :restore_CheckBoxes                 >nul 2>&1
+if %symbol%==105 call :restore_DifferentInputMethod       >nul 2>&1
+goto :registry_restore
+
+:restore_chat
+rem          Restore chat on taskbar
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarMn
+goto :eof
+
+:restore_cortana_icon
+rem          Restore Cortana on taskbar
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v ShowCortanaButton
+goto :eof
+
+:restore_TaskView_icon
+rem          Restore task view on taskbar
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v ShowTaskViewButton
+goto :eof
+
+:restore_search_icon
+rem          Restore search on taskbar
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search" /f /v SearchboxTaskbarMode
+goto :eof
+
+:restore_meet_icon
+rem          Restore meet now
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideSCAMeetNow
+goto :eof
+
+:restore_NewsAndInterests_icon
+rem          Restore news and interests
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds
+goto :eof
+
+:restore_WidgetsFromTheTaskbar_icon
+rem          Remove Widgets from the Taskbar
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarDa
+goto :eof
+
+:restore_MostUsedList
+rem          Disable "Always hide most used list in start menu"
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps
+goto :eof
+
+:restore_ShowRecentlyAddedApps
+rem          Enable show recently added apps
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps
+goto :eof
+
+:restore_ShowRecentlyOpened
+rem          Enable "Show recently opened items in Start..."
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v Start_TrackDocs
+goto :eof
+
+:restore_CompactMode
+rem          Disable Compact Mode
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v UseCompactMode
+goto :eof
+
+:restore_OpenFileExplorer
+rem          Open file explorer to - Quick access
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v LaunchTo
+goto :eof
+
+:restore_FileNameExtensions
+rem          Disable Show file name extensions
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v HideFileExt /t REG_DWORD /d 00000001
+goto :eof
+
+:restore_SoundCommunications
+rem          Restore Sound communications tab
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Multimedia\Audio" /f /v UserDuckingPreference
+goto :eof
+
+:restore_StartupSound
+rem          Enable startup sound
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation" /f /v DisableStartupSound /t REG_DWORD /d 00000000
+goto :eof
+
+:restore_EnhancePointerPrecision
+rem          Restore enhance pointer precision
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseSpeed /t REG_SZ /d 1
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold1 /t REG_SZ /d 6
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /f /v MouseThreshold2 /t REG_SZ /d 10
+goto :eof
+
+:restore_AutomaticMaintenance
+rem          Enable automatic maintenance
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /f /v MaintenanceDisabled
+goto :eof
+
+:restore_UseMySignInInfo
+rem          Enable "Use my sign in info after restart"
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v DisableAutomaticRestartSignOn
+goto :eof
+
+:restore_AltTab
+rem          Alt tab open - Open windows and 5 most recent...
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v MultiTaskingAltTabFilter
+goto :eof
+
+:restore_ClassicContextMenu
+rem          Disable the classic context menu
+reg delete "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
+goto :eof
+
+:restore_SuggestWays
+rem          Enable "Suggest ways to get the most out of Windows..."
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /f /v ScoobeSystemSettingEnabled
+goto :eof
+
+:restore_WindowsExperience
+rem          Enable "Windows Experience ..."
+reg delete "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-310093Enabled
+goto :eof
+
+:restore_TipsAndSuggestions
+rem          Enable "Get tips and suggestions when using Windows"
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338389Enabled /t REG_DWORD /d 00000001
+goto :eof
+
+:restore_NumLock
+rem          Disable NumLock by default
+reg add "HKEY_USERS\.DEFAULT\Control Panel\Keyboard" /f /v InitialKeyboardIndicators /t REG_SZ /d 2147483648
+goto :eof
+
+:restore_EaseOfAccessSettings
+rem          Enable ease of access settings (Narrator + Sticky Keys)
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /ve
+reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys" /f /v Flags /t REG_SZ /d 510
+reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys" /f /v Flags /t REG_SZ /d 62
+goto :eof
+
+:restore_CheckBoxes
+rem          Disable file explorer checkboxes
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
+goto :eof
+
+:restore_DifferentInputMethod
+rem          Disable "Let me use a different input method for each app window"
+reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e068092000000
+goto :eof
+
+:registry_restore_all_keys
+call :restore_chat                       >nul 2>&1
+call :restore_cortana_icon               >nul 2>&1
+call :restore_TaskView_icon              >nul 2>&1
+call :restore_search_icon                >nul 2>&1
+call :restore_meet_icon                  >nul 2>&1
+call :restore_NewsAndInterests_icon      >nul 2>&1
+call :restore_WidgetsFromTheTaskbar_icon >nul 2>&1
+call :restore_MostUsedList               >nul 2>&1
+call :restore_ShowRecentlyAddedApps      >nul 2>&1
+call :restore_ShowRecentlyOpened         >nul 2>&1
+call :restore_CompactMode                >nul 2>&1
+call :restore_OpenFileExplorer           >nul 2>&1
+call :restore_FileNameExtensions         >nul 2>&1
+call :restore_SoundCommunications        >nul 2>&1
+call :restore_StartupSound               >nul 2>&1
+call :restore_EnhancePointerPrecision    >nul 2>&1
+call :restore_AutomaticMaintenance       >nul 2>&1
+call :restore_UseMySignInInfo            >nul 2>&1
+call :restore_AltTab                     >nul 2>&1
+call :restore_ClassicContextMenu         >nul 2>&1
+call :restore_SuggestWays                >nul 2>&1
+call :restore_WindowsExperience          >nul 2>&1
+call :restore_TipsAndSuggestions         >nul 2>&1
+call :restore_NumLock                    >nul 2>&1
+call :restore_EaseOfAccessSettings       >nul 2>&1
+call :restore_CheckBoxes                 >nul 2>&1
+call :restore_DifferentInputMethod       >nul 2>&1
+goto :registry_restore
 
 rem                     THIRD CHAPTER - WINGET
 :winget
@@ -310,16 +527,16 @@ echo: [25] .NET Framework
 if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type selected-apps.txt 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
-if %symbol%==0 goto :menu
-if %symbol%==1 goto :C++Redist
-if %symbol%==2 goto :7zip
-if %symbol%==3 goto :Firefox
-if %symbol%==4 goto :Chrome
-if %symbol%==5 goto :Notepad++
-if %symbol%==6 goto :Discord
-if %symbol%==7 goto :Parsec
-if %symbol%==8 goto :Steam
-if %symbol%==9 goto :EpicGamesLauncher
+if %symbol%==0  goto :menu
+if %symbol%==1  goto :C++Redist
+if %symbol%==2  goto :7zip
+if %symbol%==3  goto :Firefox
+if %symbol%==4  goto :Chrome
+if %symbol%==5  goto :Notepad++
+if %symbol%==6  goto :Discord
+if %symbol%==7  goto :Parsec
+if %symbol%==8  goto :Steam
+if %symbol%==9  goto :EpicGamesLauncher
 if %symbol%==10 goto :Ubisoft
 if %symbol%==11 goto :MicrosoftTeams
 if %symbol%==12 goto :OBSStudio
@@ -336,8 +553,8 @@ if %symbol%==22 goto :VLC
 if %symbol%==23 goto :CloudflareWarp
 if %symbol%==24 goto :ChocolateyGUI
 if %symbol%==25 goto :dotNetFramework
-if %symbol%==* goto :endofthewingetfile
-if %symbol%==/ call :delete & goto :startofthewingetfile
+if %symbol%==*  goto :endofthewingetfile
+if %symbol%==/  call :delete & goto :startofthewingetfile
 goto :wingetmenu
 
 :startofthewingetfile
@@ -532,15 +749,15 @@ call :winget_app
 echo Cloudflare Warp added>> selected-apps.txt
 goto :wingetmenu
 
-:Chocolatey
-echo LAUNCHING CHOCOLATEY INSTALLATION SCRIPT
-powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) 
-goto :ChocolateyGUIcontinue
-
 :ChocolateyGUI
 choice /n /m "HAVE YOU ALREADY INSTALLED CHOCOLATEY? [Y/N]"
 if errorlevel 2 goto :Chocolatey
 if errorlevel 1 goto :ChocolateyGUIcontinue
+
+:Chocolatey
+echo LAUNCHING CHOCOLATEY INSTALLATION SCRIPT
+powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) 
+goto :ChocolateyGUIcontinue
 
 :ChocolateyGUIcontinue
 if exist selected-apps.txt find /c "Chocolatey GUI added" selected-apps.txt >nul && goto :wingetmenu
