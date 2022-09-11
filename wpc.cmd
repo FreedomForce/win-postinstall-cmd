@@ -475,7 +475,7 @@ goto :eof
 
 :restore_DifferentInputMethod
 rem          Disable "Let me use a different input method for each app window"
-reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e068092000000
+reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e078012000000
 goto :eof
 
 :registry_restore_all_keys
