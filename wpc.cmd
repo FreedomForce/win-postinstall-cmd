@@ -60,7 +60,7 @@ goto :tweaks
 rem                     SECOND CHAPTER - REGISTRY KEYS
 :registry
 cls & %print% SELECT YOUR TASK: & echo.
-echo: [11] Remove chat from taskbar                             [21] Remove Cortana from taskbar 
+echo: [11] Remove chat from taskba                             [21] Remove Cortana from taskbar 
 echo: [12] Remove task view from taskbar                        [22] Remove search from taskbar
 echo: [13] Remove meet now                                      [23] Remove news and interests
 echo: [14] Remove taskbar pins                                  [24] Remove Widgets from the Taskbar
