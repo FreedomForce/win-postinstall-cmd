@@ -2,7 +2,7 @@
 mode con: cols=145 lines=30
 title win-postinstall-cmd
 cd /d %~dp0
-set breakline=------------------------------------------------------------------------------------------
+set "breakline=__________________________________________________________________________________________"
 set "print=echo. & echo"
 
 :menu
@@ -78,7 +78,7 @@ echo: [105] Enable file explorer checkboxes                     [205] Enable "Le
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 if %symbol%==/   goto :registry_restore
-if %symbol%==*   call :registry_all_keys
+if %symbol%==*   goto :registry_all_keys
 if %symbol%==0   call :menu
 if %symbol%==11  call :import_chat                       >nul 2>&1
 if %symbol%==21  call :import_cortana_icon               >nul 2>&1
@@ -514,7 +514,7 @@ goto :startofthewingetfile
 
 :wingetmenu
 cls & %print% SELECT WHAT TO INSTALL: & echo.
-echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox
+echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox (ESR)
 echo: [4] Chrome                      [5] Notepad++                   [6] Discord
 echo: [7] Parsec                      [8] Steam                       [9] Epic Games Launcher
 echo: [10] Ubisoft Connect            [11] Microsoft Teams            [12] OBS Studio
@@ -522,15 +522,18 @@ echo: [13] Zero Tier One              [14] qBittorrent                [15] Sandb
 echo: [16] Viber                      [17] Java                       [18] PowerToys
 echo: [19] KeePass                    [20] Malwarebytes               [21] Zoom
 echo: [22] VLC                        [23] Cloudflare Warp            [24] Chocolatey GUI
-echo: [25] .NET Framework
+echo: [25] .NET Framework             [26] AutoHotkey                 [27] Wireshark
+echo: [28] GIMP                       [29] ShareX
 %print% [*] CREATE FILE & echo [0] GO BACK
 if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type selected-apps.txt 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
+if %symbol%==*  goto :endofthewingetfile
+if %symbol%==/  call :delete & goto :startofthewingetfile
 if %symbol%==0  goto :menu
 if %symbol%==1  goto :C++Redist
 if %symbol%==2  goto :7zip
-if %symbol%==3  goto :Firefox
+if %symbol%==3  goto :FirefoxESR
 if %symbol%==4  goto :Chrome
 if %symbol%==5  goto :Notepad++
 if %symbol%==6  goto :Discord
@@ -553,8 +556,10 @@ if %symbol%==22 goto :VLC
 if %symbol%==23 goto :CloudflareWarp
 if %symbol%==24 goto :ChocolateyGUI
 if %symbol%==25 goto :dotNetFramework
-if %symbol%==*  goto :endofthewingetfile
-if %symbol%==/  call :delete & goto :startofthewingetfile
+if %symbol%==26 goto :AutoHotkey
+if %symbol%==27 goto :Wireshark
+if %symbol%==28 goto :GIMP
+if %symbol%==29 goto :ShareX
 goto :wingetmenu
 
 :startofthewingetfile
@@ -569,7 +574,8 @@ echo            [>> winget.json
 goto :wingetmenu
 
 :C++Redist
-if exist selected-apps.txt find /c "C++ Redistributable added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=C++ Redistributable added"
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
 set wingetapp=Microsoft.VC++2015-2022Redist-x64
 call :winget_app
 set wingetapp=Microsoft.VC++2015-2019Redist-x86
@@ -591,163 +597,139 @@ call :winget_app
 set wingetapp=Microsoft.VC++2005Redist-x86
 call :winget_app
 set wingetapp=Microsoft.VC++2005Redist-x64
-call :winget_app
-echo C++ Redistributable added>> selected-apps.txt
-goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :7zip
-if exist selected-apps.txt find /c "7zip added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=7zip added"
 set wingetapp=7zip.7zip
-call :winget_app
-echo 7zip added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
-:Firefox
-if exist selected-apps.txt find /c "Firefox added" selected-apps.txt >nul && goto :wingetmenu
+:FirefoxESR
+set "app_added=Firefox (ESR) added"
 set wingetapp=Mozilla.Firefox.ESR
-call :winget_app
-echo Firefox added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Chrome
-if exist selected-apps.txt find /c "Chrome added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Chrome added"
 set wingetapp=Google.Chrome
-call :winget_app
-echo Chrome added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Notepad++
-if exist selected-apps.txt find /c "Notepad++ added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Notepad++ added"
 set wingetapp=Notepad++.Notepad++
-call :winget_app
-echo Notepad++ added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Discord
-if exist selected-apps.txt find /c "Discord added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Discord added"
 set wingetapp=Discord.Discord
-call :winget_app
-echo Discord added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Parsec
-if exist selected-apps.txt find /c "Parsec added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Parsec added"
 set wingetapp=Parsec.Parsec
-call :winget_app
-echo Parsec added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Steam
-if exist selected-apps.txt find /c "Steam added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Steam added"
 set wingetapp=Valve.Steam
-call :winget_app
-echo Steam added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :EpicGamesLauncher
-if exist selected-apps.txt find /c "Epic Games Launcher added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Epic Games Launcher added"
 set wingetapp=EpicGames.EpicGamesLauncher
-call :winget_app
-echo Epic Games Launcher added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Ubisoft
-if exist selected-apps.txt find /c "Ubisoft Connect added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Ubisoft Connect added"
 set wingetapp=Ubisoft.Connect
-call :winget_app
-echo Ubisoft Connect added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :MicrosoftTeams
-if exist selected-apps.txt find /c "Microsoft Teams added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Microsoft Teams added"
 set wingetapp=Microsoft.Teams
-call :winget_app
-echo Microsoft Teams added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :OBSStudio
-if exist selected-apps.txt find /c "OBS Studio added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=OBS Studio added"
 set wingetapp=OBSProject.OBSStudio
-call :winget_app
-echo OBS Studio added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :ZeroTierOne
-if exist selected-apps.txt find /c "Zero Tier One added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Zero Tier One added"
 set wingetapp=ZeroTier.ZeroTierOne
-call :winget_app
-echo Zero Tier One added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :qBittorrent
-if exist selected-apps.txt find /c "qBittorrent added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=qBittorrent added"
 set wingetapp=qBittorrent.qBittorrent
-call :winget_app
-echo qBittorrent added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :SandboxiePlus
-if exist selected-apps.txt find /c "Sandboxie Plus added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Sandboxie Plus added"
 set wingetapp=Sandboxie.Plus
-call :winget_app
-echo Sandboxie Plus added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Viber
-if exist selected-apps.txt find /c "Viber added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Viber added"
 set wingetapp=Viber.Viber
-call :winget_app
-echo Viber added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Java
-if exist selected-apps.txt find /c "Java added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Java added"
 set wingetapp=Oracle.JavaRuntimeEnvironment
-call :winget_app
-echo Java added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :PowerToys
-if exist selected-apps.txt find /c "PowerToys added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=PowerToys added"
 set wingetapp=Microsoft.PowerToys
-call :winget_app
-echo PowerToys added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :KeePass
-if exist selected-apps.txt find /c "KeePass added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=KeePass added"
 set wingetapp=DominikReichl.KeePass
-call :winget_app
-echo KeePass added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Malwarebytes
-if exist selected-apps.txt find /c "Malwarebytes added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Malwarebytes added"
 set wingetapp=Malwarebytes.Malwarebytes
-call :winget_app
-echo Malwarebytes added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :Zoom
-if exist selected-apps.txt find /c "Zoom added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Zoom added"
 set wingetapp=Zoom.Zoom
-call :winget_app
-echo Zoom added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :VLC
-if exist selected-apps.txt find /c "VLC added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=VLC added"
 set wingetapp=VideoLAN.VLC
-call :winget_app
-echo VLC added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :CloudflareWarp
-if exist selected-apps.txt find /c "Cloudflare Warp added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Cloudflare Warp added"
 set wingetapp=Cloudflare.Warp
-call :winget_app
-echo Cloudflare Warp added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :ChocolateyGUI
 choice /n /m "HAVE YOU ALREADY INSTALLED CHOCOLATEY? [Y/N]"
@@ -760,18 +742,40 @@ powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.Service
 goto :ChocolateyGUIcontinue
 
 :ChocolateyGUIcontinue
-if exist selected-apps.txt find /c "Chocolatey GUI added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=Chocolatey GUI added"
 set wingetapp=Chocolatey.ChocolateyGUI
-call :winget_app
-echo Chocolatey GUI added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :dotNetFramework
-if exist selected-apps.txt find /c ".NET Framework added" selected-apps.txt >nul && goto :wingetmenu
+set "app_added=.NET Framework added"
 set wingetapp=Microsoft.dotNetFramework
-call :winget_app
-echo .NET Framework added>> selected-apps.txt
-goto :wingetmenu
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
+
+:AutoHotkey
+set "app_added=AutoHotkey added"
+set wingetapp=Lexikos.AutoHotkey
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
+
+:Wireshark
+set "app_added=Wireshark added"
+set wingetapp=WiresharkFoundation.Wireshark
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
+
+:GIMP
+set "app_added=GIMP added"
+set wingetapp=GIMP.GIMP
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
+
+:ShareX
+set "app_added=ShareX added"
+set wingetapp=ShareX.ShareX
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :wingetmenu
+call :winget_app & goto :wingetmenu
 
 :endofthewingetfile
 echo            ],>> winget.json
@@ -794,8 +798,10 @@ pause & goto :menu
 echo                {>> winget.json
 echo                    "PackageIdentifier" : "%wingetapp%">> winget.json
 echo                },>> winget.json
+if not exist selected-apps.txt echo %app_added%>> selected-apps.txt
+if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof || echo %app_added%>> selected-apps.txt
 goto :eof
 
 :delete
-if exist winget.json del winget.json 2>nul & del selected-apps.txt 2>nul & rmdir /s /q %Temp%\WinGet\ 2>nul 
+if exist winget.json del winget.json >nul 2>&1 & del selected-apps.txt >nul 2>&1 & rmdir /s /q %Temp%\WinGet\ >nul 2>&1
 goto :eof
