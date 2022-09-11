@@ -1,4 +1,5 @@
 @echo off
+setlocal EnableDelayedExpansion
 mode con: cols=145 lines=30
 title win-postinstall-cmd
 cd /d %~dp0
@@ -12,11 +13,10 @@ echo: [1] TWEAKS
 echo: [2] IMPORT SETTINGS
 echo: [3] INSTALL APPLICATIONS
 
-set "number=Error" & echo. & set /p number= ENTER THE NUMBER: 
-if %number%==1 goto :tweaks
-if %number%==2 goto :registry
-if %number%==3 goto :winget
-goto :menu
+echo. & choice /c 123 /n /m "ENTER THE NUMBER: "
+if errorlevel 3 goto :winget
+if errorlevel 2 goto :registry
+if errorlevel 1 goto :tweaks
 
 rem                     FIRST CHAPTER - UPDATES AND USER SETTINGS
 :tweaks
@@ -137,7 +137,7 @@ goto :eof
 
 :import_NewsAndInterests_icon
 rem          Remove news and interests
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds /t REG_DWORD /d 00000000
+reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds /t REG_DWORD /d 00000000
 goto :eof
 
 :import_TaskbarPins
@@ -153,13 +153,13 @@ goto :eof
 
 :import_MostUsedList
 rem          Always hide most used list in start menu
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002
+reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002
 goto :eof
 
 :import_ShowRecentlyAddedApps
 rem          Disable show recently added apps
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
+reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
 goto :eof
 
 :import_ShowRecentlyOpened
@@ -201,12 +201,12 @@ goto :eof
 
 :import_AutomaticMaintenance
 rem          Disable automatic maintenance
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /f /v MaintenanceDisabled /t REG_DWORD /d 00000001
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /f /v MaintenanceDisabled /t REG_DWORD /d 00000001
 goto :eof
 
 :import_UseMySignInInfo
 rem          Disable use my sign in info after restart
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v DisableAutomaticRestartSignOn /t REG_DWORD /d 00000001
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System" /f /v DisableAutomaticRestartSignOn /t REG_DWORD /d 00000001
 goto :eof
 
 :import_AltTab
@@ -226,12 +226,12 @@ goto :eof
 
 :import_WindowsExperience
 rem          Disable "Windows Experience..."
-reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-310093Enabled /t REG_DWORD /d 00000000
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-310093Enabled /t REG_DWORD /d 00000000
 goto :eof
 
 :import_TipsAndSuggestions
 rem          Disable "Get tips and suggestions when using Windows"
-reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338389Enabled /t REG_DWORD /d 00000000
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338389Enabled /t REG_DWORD /d 00000000
 goto :eof
 
 :import_NumLock
@@ -249,7 +249,7 @@ goto :eof
 
 :import_CheckBoxes
 rem          Enable file explorer checkboxes
-reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
 goto :eof
 
 :import_DifferentInputMethod
@@ -365,7 +365,7 @@ goto :eof
 
 :restore_NewsAndInterests_icon
 rem          Restore news and interests
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds
+reg delete "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds
 goto :eof
 
 :restore_WidgetsFromTheTaskbar_icon
@@ -375,13 +375,13 @@ goto :eof
 
 :restore_MostUsedList
 rem          Disable "Always hide most used list in start menu"
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps
+reg delete "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps
 goto :eof
 
 :restore_ShowRecentlyAddedApps
 rem          Enable show recently added apps
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps
+reg delete "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps
+reg delete "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps
 goto :eof
 
 :restore_ShowRecentlyOpened
@@ -423,12 +423,12 @@ goto :eof
 
 :restore_AutomaticMaintenance
 rem          Enable automatic maintenance
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /f /v MaintenanceDisabled
+reg delete "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /f /v MaintenanceDisabled
 goto :eof
 
 :restore_UseMySignInInfo
 rem          Enable "Use my sign in info after restart"
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v DisableAutomaticRestartSignOn
+reg delete "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System" /f /v DisableAutomaticRestartSignOn
 goto :eof
 
 :restore_AltTab
@@ -448,12 +448,12 @@ goto :eof
 
 :restore_WindowsExperience
 rem          Enable "Windows Experience ..."
-reg delete "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-310093Enabled
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-310093Enabled
 goto :eof
 
 :restore_TipsAndSuggestions
 rem          Enable "Get tips and suggestions when using Windows"
-reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338389Enabled /t REG_DWORD /d 00000001
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338389Enabled /t REG_DWORD /d 00000001
 goto :eof
 
 :restore_NumLock
@@ -470,7 +470,7 @@ goto :eof
 
 :restore_CheckBoxes
 rem          Disable file explorer checkboxes
-reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v AutoCheckSelect /t REG_DWORD /d 1
 goto :eof
 
 :restore_DifferentInputMethod
