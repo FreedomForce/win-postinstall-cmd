@@ -778,6 +778,7 @@ if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && 
 call :winget_app & goto :wingetmenu
 
 :endofthewingetfile
+if not exist selected-apps.txt goto :wingetmenu
 echo            ],>> winget.json
 echo            "SourceDetails" : >> winget.json
 echo            {>> winget.json
