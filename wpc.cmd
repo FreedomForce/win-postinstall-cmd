@@ -524,7 +524,7 @@ echo: [19] KeePass                    [20] Malwarebytes               [21] Zoom
 echo: [22] VLC                        [23] Cloudflare Warp            [24] Chocolatey GUI
 echo: [25] .NET Framework             [26] AutoHotkey                 [27] Wireshark
 echo: [28] GIMP                       [29] ShareX
-%print% [*] CREATE FILE & echo [0] GO BACK
+%print% [*] INSTALL SELECTED APP/APPS & echo [0] GO BACK
 if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type selected-apps.txt 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
@@ -790,7 +790,7 @@ echo        }>> winget.json
 echo    ]>> winget.json
 echo }>> winget.json
 
-echo %breakline% & %print% FILE CREATED. PRESS ANY KEY TO INITIALIZE WINGET.JSON & pause
+echo %breakline% & %print% PRESS ANY KEY TO INSTALL SELECTED APP/APPS & pause
 winget import -i .\winget.json --accept-source-agreements --accept-package-agreements
 pause & goto :menu
 
