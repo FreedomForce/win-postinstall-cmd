@@ -21,4 +21,4 @@ If you do not have [App Installer](https://www.microsoft.com/store/productId/9NB
 ![image](https://user-images.githubusercontent.com/78738795/189702712-b388789c-f030-45a0-b664-0ef8ffc65b57.png)
 
 **Select the third option "INSTALL APPLICATIONS" in the main menu if you need to install an application or applications from a pre-defined list.**
-![image](https://user-images.githubusercontent.com/78738795/189703341-7aeb8c63-5c4a-4144-be91-40efda5130ee.png)
+![image](https://user-images.githubusercontent.com/78738795/189711302-02c53c6b-2007-4d77-bda3-93717f9dafed.png)
