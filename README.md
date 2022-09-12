@@ -10,7 +10,8 @@ It is a .CMD file that executes pre-defined commands, creates files, imports lin
 **First of all, you need to check winget for updates. To do this, please select the first option "TWEAKS" in the main menu.**
 ![image](https://user-images.githubusercontent.com/78738795/189696689-a67c00f4-117d-4e81-896d-36fc3d99ecc7.png)
 Then enter the "1" to select "CHECK IF WINGET IS INSTALLED". The update process will start up automatically. In case of any malfunction, repeat the previous step.
-If you do not have [App Installer](https://www.microsoft.com/store/productId/9NBLGGH4NNS1) (https://www.microsoft.com/store/productId/9NBLGGH4NNS1) consider to install it, you need it to install applications using this script. (Optionally) Alternatively, you can use Chocolatey as a package manager and install applications using the terminal on your own (you can install it in the "INSTALL APPLICATIONS" option by selecting "Chocolatey GUI", it will ask you if you want to install Chocolatey.)
+If you do not have [App Installer](https://www.microsoft.com/store/productId/9NBLGGH4NNS1) (https://www.microsoft.com/store/productId/9NBLGGH4NNS1) consider to install it, you need it to install applications using this script. 
+###### (Optionally) Alternatively, you can use Chocolatey as a package manager and install applications using the terminal on your own (you can install it in the "INSTALL APPLICATIONS" option by selecting "Chocolatey GUI", it will ask you if you want to install Chocolatey.)
 - Here you can "CHECK FOR UPDATES". The update process will start up automatically. In case of any malfunction, repeat the previous step.
 - Here you can "DISABLE HIBERNATE" (Recommended). This will turn off fast startup and hibernate.
 - Here you can "DISABLE PASSWORD EXPIRATION" (Recommended). Select this in case you install Windows using Unattended.xml or you simply need to disable password expiration.
