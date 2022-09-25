@@ -18,7 +18,7 @@ If you do not have [App Installer](https://www.microsoft.com/store/productId/9NB
 - Here you can "OPEN OLD MIXER". If you need to pin an older mixer to the taskbar on your Windows 11.
 
 **Select the second option "IMPORT SETTINGS" in the main menu if you need to quickly import user settings after a fresh installation. In case you need to revert the imported setting to the default value select "[/] RESTORE SETTINGS"**
-![image](https://user-images.githubusercontent.com/78738795/189702712-b388789c-f030-45a0-b664-0ef8ffc65b57.png)
+![image](https://user-images.githubusercontent.com/78738795/192158896-38f3d5b6-b569-4a76-9b5f-6200f41036b7.png)
 
 **Select the third option "INSTALL APPLICATIONS" in the main menu if you need to install an application or applications from a pre-defined list.**
-![image](https://user-images.githubusercontent.com/78738795/189711302-02c53c6b-2007-4d77-bda3-93717f9dafed.png)
+![image](https://user-images.githubusercontent.com/78738795/192158919-3e9b790c-4f41-4f71-b434-2a873bbbbd60.png)
