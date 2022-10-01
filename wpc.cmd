@@ -576,7 +576,7 @@ if %symbol%==30 call :LibreOffice
 goto :wingetmenu
 
 :checkForUpdates
-winget upgrade --all
+winget upgrade --accept-source-agreements --all
 pause & goto :wingetmenu
 
 :winget_variables
