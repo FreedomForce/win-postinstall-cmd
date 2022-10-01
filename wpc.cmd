@@ -1,4 +1,5 @@
 @echo off
+if not "%1"=="am_admin" call powershell -h | %WINDIR%\System32\find.exe /i "powershell" > nul && if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin > nul & exit)
 setlocal EnableDelayedExpansion
 mode con: cols=145 lines=30
 title win-postinstall-cmd
@@ -7,7 +8,7 @@ set "breakline=_________________________________________________________________
 set "print=echo. & echo"
 
 :menu
-cls & call :delete
+cls
 %print% SELECT YOUR TASK: & echo.
 echo: [1] TWEAKS
 echo: [2] IMPORT SETTINGS
@@ -26,6 +27,7 @@ echo: [2] CHECK FOR UPDATES
 echo: [3] DISABLE HIBERNATE
 echo: [4] DISABLE PASSWORD EXPIRATION
 echo: [5] OPEN OLD MIXER
+echo: [6] Delete UWP apps
 %print% [0] GO BACK
 
 set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
@@ -35,6 +37,7 @@ if %number%==2 goto :update_windows
 if %number%==3 goto :disable_hibernate
 if %number%==4 goto :disable_passwordExp
 if %number%==5 goto :open_oldMixer
+if %number%==6 goto :delete_uwp_apps
 goto :tweaks
 
 :update_winget
@@ -56,6 +59,17 @@ pause & goto :tweaks
 :open_oldMixer
 sndvol.exe
 goto :tweaks
+
+:delete_uwp_apps
+winget uninstall Microsoft.People_8wekyb3d8bbwe
+winget uninstall Microsoft.549981C3F5F10_8wekyb3d8bbwe
+winget uninstall Microsoft.MSPaint_8wekyb3d8bbwe
+winget uninstall Microsoft.GetHelp_8wekyb3d8bbwe
+winget uninstall Microsoft.YourPhone_8wekyb3d8bbwe
+winget uninstall MicrosoftCorporationII.QuickAssist_8wekyb3d8bbwe
+winget uninstall Microsoft.WindowsAlarms_8wekyb3d8bbwe
+winget uninstall Microsoft.WindowsMaps_8wekyb3d8bbwe
+pause & goto :tweaks
 
 rem                     SECOND CHAPTER - REGISTRY KEYS
 :registry
@@ -561,25 +575,30 @@ if %symbol%==29 call :ShareX
 if %symbol%==30 call :LibreOffice
 goto :wingetmenu
 
-:startofthewingetfile
-echo {>> winget.json
-echo    "$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> winget.json
-echo    "CreationDate" : "2022-09",>> winget.json
-echo    "Sources" : >> winget.json
-echo    [>> winget.json
-echo        {>> winget.json
-echo            "Packages" : >> winget.json
-echo            [>> winget.json
-goto :eof
-
 :checkForUpdates
-winget upgrade -q --all --accept-source-agreements
+winget upgrade --all
 pause & goto :wingetmenu
 
+:winget_variables
+set app_list=selected-apps.txt
+set app_install=winget.json
+
+:startofthewingetfile
+call :delete
+echo {>> %app_install%
+echo    "$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> %app_install%
+echo    "CreationDate" : "2022-09",>> %app_install%
+echo    "Sources" : >> %app_install%
+echo    [>> %app_install%
+echo        {>> %app_install%
+echo            "Packages" : >> %app_install%
+echo            [>> %app_install%
+goto :eof
+
 :CPPRedist
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=C++ Redistributable added"
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
+if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof
 set wingetapp=Microsoft.VC++2015-2022Redist-x64
 call :winget_app
 set wingetapp=Microsoft.VC++2015-2019Redist-x86
@@ -604,157 +623,135 @@ set wingetapp=Microsoft.VC++2005Redist-x64
 call :winget_app & goto :eof
 
 :7zip
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=7zip added"
 set wingetapp=7zip.7zip
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :FirefoxESR
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Firefox (ESR) added"
 set wingetapp=Mozilla.Firefox.ESR
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Chrome
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Chrome added"
 set wingetapp=Google.Chrome
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :NotepadPP
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Notepad++ added"
 set wingetapp=Notepad++.Notepad++
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Discord
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Discord added"
 set wingetapp=Discord.Discord
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Parsec
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Parsec added"
 set wingetapp=Parsec.Parsec
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Steam
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Steam added"
 set wingetapp=Valve.Steam
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :EpicGamesLauncher
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Epic Games Launcher added"
 set wingetapp=EpicGames.EpicGamesLauncher
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Ubisoft
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Ubisoft Connect added"
 set wingetapp=Ubisoft.Connect
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :MicrosoftTeams
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Microsoft Teams added"
 set wingetapp=Microsoft.Teams
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :OBSStudio
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=OBS Studio added"
 set wingetapp=OBSProject.OBSStudio
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :ZeroTierOne
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Zero Tier One added"
 set wingetapp=ZeroTier.ZeroTierOne
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :qBittorrent
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=qBittorrent added"
 set wingetapp=qBittorrent.qBittorrent
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :SandboxiePlus
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Sandboxie Plus added"
 set wingetapp=Sandboxie.Plus
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Viber
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Viber added"
 set wingetapp=Viber.Viber
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Java
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Java added"
 set wingetapp=Oracle.JavaRuntimeEnvironment
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :PowerToys
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=PowerToys added"
 set wingetapp=Microsoft.PowerToys
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :KeePass
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=KeePass added"
 set wingetapp=DominikReichl.KeePass
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Malwarebytes
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Malwarebytes added"
 set wingetapp=Malwarebytes.Malwarebytes
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Zoom
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Zoom added"
 set wingetapp=Zoom.Zoom
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :VLC
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=VLC added"
 set wingetapp=VideoLAN.VLC
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :CloudflareWarp
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Cloudflare Warp added"
 set wingetapp=Cloudflare.Warp
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :ChocolateyGUI
@@ -768,80 +765,74 @@ powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.Service
 goto :ChocolateyGUIcontinue
 
 :ChocolateyGUIcontinue
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Chocolatey GUI added"
 set wingetapp=Chocolatey.ChocolateyGUI
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :dotNetFramework
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=.NET Framework added"
 set wingetapp=Microsoft.dotNetFramework
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :AutoHotkey
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=AutoHotkey added"
 set wingetapp=Lexikos.AutoHotkey
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :Wireshark
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=Wireshark added"
 set wingetapp=WiresharkFoundation.Wireshark
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :GIMP
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=GIMP added"
 set wingetapp=GIMP.GIMP
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :ShareX
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=ShareX added"
 set wingetapp=ShareX.ShareX
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :LibreOffice
-if not exist winget.json call :startofthewingetfile >nul 2>&1
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
 set "app_added=LibreOffice added"
 set wingetapp=TheDocumentFoundation.LibreOffice
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof
 call :winget_app & goto :eof
 
 :endofthewingetfile
-if not exist selected-apps.txt goto :eof
-echo            ],>> winget.json
-echo            "SourceDetails" : >> winget.json
-echo            {>> winget.json
-echo                "Argument" : "https://winget.azureedge.net/cache",>> winget.json
-echo                "Identifier" : "Microsoft.Winget.Source_8wekyb3d8bbwe",>> winget.json
-echo                "Name" : "winget",>> winget.json
-echo                "Type" : "Microsoft.PreIndexed.Package">> winget.json
-echo            }>> winget.json
-echo        }>> winget.json
-echo    ]>> winget.json
-echo }>> winget.json
+if not exist %app_list% goto :eof
+echo            ],>> %app_install%
+echo            "SourceDetails" : >> %app_install%
+echo            {>> %app_install%
+echo                "Argument" : "https://winget.azureedge.net/cache",>> %app_install%
+echo                "Identifier" : "Microsoft.Winget.Source_8wekyb3d8bbwe",>> %app_install%
+echo                "Name" : "winget",>> %app_install%
+echo                "Type" : "Microsoft.PreIndexed.Package">> %app_install%
+echo            }>> %app_install%
+echo        }>> %app_install%
+echo    ]>> %app_install%
+echo }>> %app_install%
 
 echo %breakline% & %print% PRESS ANY KEY TO INSTALL SELECTED APP/APPS & pause
-winget import -i .\winget.json --accept-source-agreements --accept-package-agreements
+winget import -i .\%app_install% --accept-source-agreements --accept-package-agreements
 pause & goto :menu
 
 :winget_app
-echo                {>> winget.json
-echo                    "PackageIdentifier" : "%wingetapp%">> winget.json
-echo                },>> winget.json
-if not exist selected-apps.txt echo %app_added%>> selected-apps.txt
-if exist selected-apps.txt find /c "%app_added%" selected-apps.txt >nul 2>&1 && goto :eof || echo %app_added%>> selected-apps.txt
+if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof
+echo                {>> %app_install%
+echo                    "PackageIdentifier" : "%wingetapp%">> %app_install%
+echo                },>> %app_install%
+if not exist %app_list% echo %app_added%>> %app_list%
+if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof || echo %app_added%>> %app_list%
 goto :eof
 
 :delete
-if exist winget.json del winget.json >nul 2>&1 & del selected-apps.txt >nul 2>&1 & rmdir /s /q %Temp%\WinGet\ >nul 2>&1
+if exist %app_install% del %app_install% >nul 2>&1 & del %app_list% >nul 2>&1 & rmdir /s /q %Temp%\WinGet\ >nul 2>&1
 goto :eof
