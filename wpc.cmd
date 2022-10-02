@@ -1,14 +1,21 @@
 @echo off
+rem                      https://github.com/FreedomForce/win-postinstall-cmd
+
+
 if not "%1"=="am_admin" call powershell -h | %WINDIR%\System32\find.exe /i "powershell" > nul && if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin > nul & exit)
 setlocal EnableDelayedExpansion
 mode con: cols=145 lines=30
 title win-postinstall-cmd
 cd /d %~dp0
+rem                     variables
 set "breakline=__________________________________________________________________________________________"
 set "print=echo. & echo"
+rem                     winget_variables
+set app_list=selected-apps.txt
+set app_install=winget.json
 
 :menu
-cls
+cls & call :delete
 %print% SELECT YOUR TASK: & echo.
 echo: [1] TWEAKS
 echo: [2] IMPORT SETTINGS
@@ -541,7 +548,7 @@ if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breaklin
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 if %symbol%==+  goto :checkForUpdates
 if %symbol%==*  call :endofthewingetfile
-if %symbol%==/  call :delete & goto :startofthewingetfile
+if %symbol%==/  call :startofthewingetfile
 if %symbol%==0  goto :menu
 if %symbol%==1  call :CPPRedist
 if %symbol%==2  call :7zip
@@ -579,10 +586,6 @@ goto :wingetmenu
 winget upgrade --accept-source-agreements --all
 pause & goto :wingetmenu
 
-:winget_variables
-set app_list=selected-apps.txt
-set app_install=winget.json
-
 :startofthewingetfile
 call :delete
 echo {>> %app_install%
@@ -597,29 +600,35 @@ goto :eof
 
 :CPPRedist
 if not exist %app_install% call :startofthewingetfile >nul 2>&1
-set "app_added=C++ Redistributable added"
-if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof
-set wingetapp=Microsoft.VC++2015-2022Redist-x64
+set "app_added=C++ Redistributable 2008 x86 added"
+set wingetapp=Microsoft.VCRedist.2008.x86
 call :winget_app
-set wingetapp=Microsoft.VC++2015-2019Redist-x86
+set "app_added=C++ Redistributable 2008 x64 added"
+set wingetapp=Microsoft.VCRedist.2008.x64
 call :winget_app
-set wingetapp=Microsoft.VC++2013Redist-x86
+set "app_added=C++ Redistributable 2005 x86 added"
+set wingetapp=Microsoft.VCRedist.2005.x86
 call :winget_app
-set wingetapp=Microsoft.VC++2013Redist-x64
+set "app_added=C++ Redistributable 2005 x64 added"
+set wingetapp=Microsoft.VCRedist.2005.x64
 call :winget_app
-set wingetapp=Microsoft.VC++2012Redist-x86
+set "app_added=C++ Redistributable 2015+ x86 added"
+set wingetapp=Microsoft.VCRedist.2015+.x86
 call :winget_app
-set wingetapp=Microsoft.VC++2012Redist-x64
+set "app_added=C++ Redistributable 2015+ x64 added"
+set wingetapp=Microsoft.VCRedist.2015+.x64
 call :winget_app
-set wingetapp=Microsoft.VC++2010Redist-x86
+set "app_added=C++ Redistributable 2012 x86 added"
+set wingetapp=Microsoft.VCRedist.2012.x86
 call :winget_app
-set wingetapp=Microsoft.VC++2008Redist-x86
+set "app_added=C++ Redistributable 2012 x64 added"
+set wingetapp=Microsoft.VCRedist.2012.x64
 call :winget_app
-set wingetapp=Microsoft.VC++2008Redist-x64
+set "app_added=C++ Redistributable 2013 x64 added"
+set wingetapp=Microsoft.VCRedist.2013.x64
 call :winget_app
-set wingetapp=Microsoft.VC++2005Redist-x86
-call :winget_app
-set wingetapp=Microsoft.VC++2005Redist-x64
+set "app_added=C++ Redistributable 2013 x86 added"
+set wingetapp=Microsoft.VCRedist.2013.x86
 call :winget_app & goto :eof
 
 :7zip
@@ -830,7 +839,7 @@ echo                {>> %app_install%
 echo                    "PackageIdentifier" : "%wingetapp%">> %app_install%
 echo                },>> %app_install%
 if not exist %app_list% echo %app_added%>> %app_list%
-if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof || echo %app_added%>> %app_list%
+echo %app_added%>> %app_list%
 goto :eof
 
 :delete
