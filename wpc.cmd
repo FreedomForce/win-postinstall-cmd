@@ -34,7 +34,6 @@ echo: [2] CHECK FOR UPDATES
 echo: [3] DISABLE HIBERNATE
 echo: [4] DISABLE PASSWORD EXPIRATION
 echo: [5] OPEN OLD MIXER
-echo: [6] Delete UWP apps
 %print% [0] GO BACK
 
 set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
@@ -44,7 +43,6 @@ if %number%==2 goto :update_windows
 if %number%==3 goto :disable_hibernate
 if %number%==4 goto :disable_passwordExp
 if %number%==5 goto :open_oldMixer
-if %number%==6 goto :delete_uwp_apps
 goto :tweaks
 
 :update_winget
@@ -66,17 +64,6 @@ pause & goto :tweaks
 :open_oldMixer
 sndvol.exe
 goto :tweaks
-
-:delete_uwp_apps
-winget uninstall Microsoft.People_8wekyb3d8bbwe
-winget uninstall Microsoft.549981C3F5F10_8wekyb3d8bbwe
-winget uninstall Microsoft.MSPaint_8wekyb3d8bbwe
-winget uninstall Microsoft.GetHelp_8wekyb3d8bbwe
-winget uninstall Microsoft.YourPhone_8wekyb3d8bbwe
-winget uninstall MicrosoftCorporationII.QuickAssist_8wekyb3d8bbwe
-winget uninstall Microsoft.WindowsAlarms_8wekyb3d8bbwe
-winget uninstall Microsoft.WindowsMaps_8wekyb3d8bbwe
-pause & goto :tweaks
 
 rem                     SECOND CHAPTER - REGISTRY KEYS
 :registry
@@ -542,6 +529,7 @@ echo: [19] KeePass                    [20] Malwarebytes               [21] Zoom
 echo: [22] VLC                        [23] Cloudflare Warp            [24] Chocolatey GUI
 echo: [25] .NET Framework             [26] AutoHotkey                 [27] Wireshark
 echo: [28] GIMP                       [29] ShareX                     [30] LibreOffice
+echo: [31] Sumatra PDF
 %print% [*] INSTALL SELECTED APP/APPS & echo [+] CHECK FOR UPDATES & echo [0] GO BACK
 if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type selected-apps.txt 2>nul
 
@@ -580,6 +568,7 @@ if %symbol%==27 call :Wireshark
 if %symbol%==28 call :GIMP
 if %symbol%==29 call :ShareX
 if %symbol%==30 call :LibreOffice
+if %symbol%==31 call :SumatraPDF
 goto :wingetmenu
 
 :checkForUpdates
@@ -815,6 +804,13 @@ set "app_added=LibreOffice added"
 set wingetapp=TheDocumentFoundation.LibreOffice
 call :winget_app & goto :eof
 
+:SumatraPDF.SumatraPDF
+if not exist %app_install% call :startofthewingetfile >nul 2>&1
+set "app_added=Sumatra PDF added"
+set wingetapp=SumatraPDF.SumatraPDF
+call :winget_app & goto :eof
+
+
 :endofthewingetfile
 if not exist %app_list% goto :eof
 echo            ],>> %app_install%
@@ -831,7 +827,7 @@ echo }>> %app_install%
 
 echo %breakline% & %print% PRESS ANY KEY TO INSTALL SELECTED APP/APPS & pause
 winget import -i .\%app_install% --accept-source-agreements --accept-package-agreements
-pause & goto :menu
+pause & goto :wingetmenu
 
 :winget_app
 if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof
@@ -839,7 +835,7 @@ echo                {>> %app_install%
 echo                    "PackageIdentifier" : "%wingetapp%">> %app_install%
 echo                },>> %app_install%
 if not exist %app_list% echo %app_added%>> %app_list%
-echo %app_added%>> %app_list%
+if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof || echo %app_added%>> %app_list%
 goto :eof
 
 :delete
