@@ -2,6 +2,7 @@
 rem                      https://github.com/FreedomForce/win-postinstall-cmd
 
 
+title win-postinstall-cmd
 if not "%1"=="am_admin" call powershell -h | %WINDIR%\System32\find.exe /i "powershell" > nul && if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin > nul & exit)
 setlocal EnableDelayedExpansion
 mode con: cols=145 lines=30
@@ -827,7 +828,7 @@ echo }>> %app_install%
 
 echo %breakline% & %print% PRESS ANY KEY TO INSTALL SELECTED APP/APPS & pause
 winget import -i .\%app_install% --accept-source-agreements --accept-package-agreements
-pause & goto :wingetmenu
+pause & call :delete & goto :wingetmenu
 
 :winget_app
 if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof
