@@ -167,9 +167,8 @@ goto :eof
 
 :import_ShowRecentlyAddedApps
 rem          Disable show recently added apps
-reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
-goto :eof
+set "win10arg=reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001" & call :win_ver
+set "win10arg=reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001" & call :win_ver & goto :eof
 
 :import_ShowRecentlyOpened
 rem          Disable show recently opened items in start, jump lists and file explorer
@@ -846,4 +845,16 @@ goto :eof
 
 :delete
 if exist %winget_file% del %winget_file% >nul 2>&1 & del %app_list% >nul 2>&1 & rmdir /s /q %Temp%\WinGet\ >nul 2>&1
+goto :eof
+
+:win_ver
+set Version=
+
+for /f "tokens=2 delims==" %%a in ('wmic os get Caption /value') do set Version=%%a
+
+if "%Version:~0,20%%"=="Microsoft Windows 10" (
+    %win10arg%
+) else "%Version:~0,20%"=="Microsoft Windows 11" (
+    %win11arg%
+)
 goto :eof
