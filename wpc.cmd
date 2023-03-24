@@ -12,8 +12,8 @@ rem                     variables
 set "breakline=__________________________________________________________________________________________"
 set "print=echo. & echo"
 rem                     winget_variables
-set app_list=selected-apps.txt
-set winget_file=winget.json
+set "app_list=%Temp%\selected-apps.txt"
+set "winget_file=%Temp%\winget.json"
 
 :menu
 cls & call :delete
@@ -22,10 +22,10 @@ echo: [1] TWEAKS
 echo: [2] IMPORT SETTINGS
 echo: [3] INSTALL APPLICATIONS
 
-echo. & choice /c 123 /n /m "ENTER THE NUMBER: "
-if %errorlevel% equ 3 goto :wingetmenu
-if %errorlevel% equ 2 goto :registry
-if %errorlevel% equ 1 goto :tweaks
+set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
+if %number%==1 goto :tweaks
+if %number%==2 goto :registry
+if %number%==3 goto :wingetmenu
 
 rem                     FIRST CHAPTER - UPDATES AND USER SETTINGS
 :tweaks
@@ -531,7 +531,7 @@ echo: [25] Wireshark                  [26] GIMP                       [27] Share
 echo: [28] LibreOffice                [29] Sumatra PDF                [30] VirtualBox
 echo: [31] Visual Studio Code
 %print% [*] INSTALL SELECTED APP/APPS & echo [+] CHECK FOR UPDATES & echo [0] GO BACK
-if exist selected-apps.txt echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type selected-apps.txt 2>nul
+if exist %app_list% echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type %app_list% 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 if %symbol%==+  goto :checkForUpdates
@@ -579,7 +579,7 @@ pause & goto :wingetmenu
 call :delete
 echo {>> %winget_file%
 echo    "$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> %winget_file%
-echo    "CreationDate" : "2022-09",>> %winget_file%
+echo    "CreationDate" : "2023-03",>> %winget_file%
 echo    "Sources" : >> %winget_file%
 echo    [>> %winget_file%
 echo        {>> %winget_file%
@@ -589,34 +589,25 @@ goto :eof
 
 :CPPRedist
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
-set "app_added=C++ Redistributable 2008 x86 added"
+set "app_added=C++ Redistributable 2005, 2008, 2012, 2013, 2015+ added"
 set wingetapp=Microsoft.VCRedist.2008.x86
-call :winget_app
-set "app_added=C++ Redistributable 2008 x64 added"
+call :winget_app & call :app_list_txt
 set wingetapp=Microsoft.VCRedist.2008.x64
 call :winget_app
-set "app_added=C++ Redistributable 2005 x86 added"
 set wingetapp=Microsoft.VCRedist.2005.x86
 call :winget_app
-set "app_added=C++ Redistributable 2005 x64 added"
 set wingetapp=Microsoft.VCRedist.2005.x64
 call :winget_app
-set "app_added=C++ Redistributable 2015+ x86 added"
 set wingetapp=Microsoft.VCRedist.2015+.x86
 call :winget_app
-set "app_added=C++ Redistributable 2015+ x64 added"
 set wingetapp=Microsoft.VCRedist.2015+.x64
 call :winget_app
-set "app_added=C++ Redistributable 2012 x86 added"
 set wingetapp=Microsoft.VCRedist.2012.x86
 call :winget_app
-set "app_added=C++ Redistributable 2012 x64 added"
 set wingetapp=Microsoft.VCRedist.2012.x64
 call :winget_app
-set "app_added=C++ Redistributable 2013 x64 added"
 set wingetapp=Microsoft.VCRedist.2013.x64
 call :winget_app
-set "app_added=C++ Redistributable 2013 x86 added"
 set wingetapp=Microsoft.VCRedist.2013.x86
 call :winget_app & goto :eof
 
@@ -624,133 +615,126 @@ call :winget_app & goto :eof
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=7zip added"
 set wingetapp=7zip.7zip
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :FirefoxESR
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Firefox (ESR) added"
 set wingetapp=Mozilla.Firefox.ESR
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Chrome
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Chrome added"
 set wingetapp=Google.Chrome
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :NotepadPP
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Notepad++ added"
 set wingetapp=Notepad++.Notepad++
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Discord
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Discord added"
 set wingetapp=Discord.Discord
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Parsec
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Parsec added"
 set wingetapp=Parsec.Parsec
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Steam
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Steam added"
 set wingetapp=Valve.Steam
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :EpicGamesLauncher
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Epic Games Launcher added"
 set wingetapp=EpicGames.EpicGamesLauncher
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Blender
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Blender added"
 set wingetapp=BlenderFoundation.Blender
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :MicrosoftTeams
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Microsoft Teams added"
 set wingetapp=Microsoft.Teams
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :OBSStudio
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=OBS Studio added"
 set wingetapp=OBSProject.OBSStudio
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :ZeroTierOne
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Zero Tier One added"
-set wingetapp=ZeroTier.ZeroTierOne
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :qBittorrent
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=qBittorrent added"
 set wingetapp=qBittorrent.qBittorrent
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :SandboxiePlus
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Sandboxie Plus added"
 set wingetapp=Sandboxie.Plus
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Viber
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Viber added"
 set wingetapp=Viber.Viber
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :JavaRE
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Java added"
 set wingetapp=Oracle.JavaRuntimeEnvironment
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :PowerToys
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=PowerToys added"
 set wingetapp=Microsoft.PowerToys
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :KeePass
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=KeePass added"
 set wingetapp=DominikReichl.KeePass
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Malwarebytes
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Malwarebytes added"
 set wingetapp=Malwarebytes.Malwarebytes
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Zoom
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Zoom added"
 set wingetapp=Zoom.Zoom
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :VLC
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=VLC added"
 set wingetapp=VideoLAN.VLC
-call :winget_app & goto :eof
-
-:CloudflareWarp
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
-set "app_added=Cloudflare Warp added"
-set wingetapp=Cloudflare.Warp
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :ChocolateyGUI
 choice /n /m "HAVE YOU ALREADY INSTALLED CHOCOLATEY? [Y/N]"
@@ -766,55 +750,55 @@ goto :ChocolateyGUIcontinue
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Chocolatey GUI added"
 set wingetapp=Chocolatey.ChocolateyGUI
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :AutoHotkey
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=AutoHotkey added"
 set wingetapp=Lexikos.AutoHotkey
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :Wireshark
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Wireshark added"
 set wingetapp=WiresharkFoundation.Wireshark
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :GIMP
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=GIMP added"
 set wingetapp=GIMP.GIMP
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :ShareX
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=ShareX added"
 set wingetapp=ShareX.ShareX
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :LibreOffice
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=LibreOffice added"
 set wingetapp=TheDocumentFoundation.LibreOffice
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :SumatraPDF.SumatraPDF
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Sumatra PDF added"
 set wingetapp=SumatraPDF.SumatraPDF
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :VirtualBox
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=VirtualBox added"
 set wingetapp=Oracle.VirtualBox
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :VisualStudioCode
 if not exist %winget_file% call :startofthewingetfile >nul 2>&1
 set "app_added=Visual Studio Code added"
 set wingetapp=Microsoft.VisualStudioCode
-call :winget_app & goto :eof
+call :winget_app & call :app_list_txt & goto :eof
 
 :endofthewingetfile
 if not exist %app_list% goto :eof
@@ -831,14 +815,17 @@ echo    ]>> %winget_file%
 echo }>> %winget_file%
 
 echo %breakline% & %print% PRESS ANY KEY TO INSTALL SELECTED APP/APPS & pause
-winget import -i .\%winget_file% --accept-source-agreements --accept-package-agreements
+winget import -i %winget_file% --accept-source-agreements --accept-package-agreements
 pause & call :delete & goto :wingetmenu
 
 :winget_app
-if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof
+if exist %winget_file% find /c "%wingetapp%" %winget_file% >nul 2>&1 && goto :eof
 echo                {>> %winget_file%
 echo                    "PackageIdentifier" : "%wingetapp%">> %winget_file%
 echo                },>> %winget_file%
+goto :eof
+
+:app_list_txt
 if not exist %app_list% echo %app_added%>> %app_list%
 if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof || echo %app_added%>> %app_list%
 goto :eof
