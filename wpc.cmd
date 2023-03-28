@@ -73,13 +73,13 @@ echo: [1] Remove chat from taskbar                             [2] Remove Cortan
 echo: [3] Remove task view from taskbar                        [4] Remove search from taskbar
 echo: [5] Remove meet now                                      [6] Remove news and interests
 echo: [7] Remove taskbar pins                                  [8] Remove Widgets from the Taskbar
-echo: [9] Always hide most used list in start menu             [10] Disable show recently added apps
+echo: [9] Always hide most used list in start menu             [10] Disable show recently added apps (Win10)
 echo: [11] Disable "Show recently opened items in Start..."    [12] Enable Compact Mode
 echo: [13] Open file explorer to - This PC                     [14] Show file name extensions
 echo: [15] Sound communications - do nothing                   [16] Disable startup sound 
 echo: [17] Turn off enhance pointer precision                  [18] Disable automatic maintenance
 echo: [19] Disable "Use my sign in info after restart"         [20] Alt tab - open windows only
-echo: [21] Restore the classic context menu                    [22] Disable "Suggest ways to get the most out of Windows..."
+echo: [21] Restore the classic context menu (Win11)            [22] Disable "Suggest ways to get the most out of Windows..."
 echo: [23] Disable "Windows Experience ..."                    [24] Disable "Get tips and suggestions when using Windows"
 echo: [25] Enable NumLock by default                           [26] Disable ease of access settings (Narrator + Sticky Keys)
 echo: [27] Enable file explorer checkboxes                     [28] Enable "Let me use a different input method for each app window"
@@ -224,8 +224,7 @@ goto :eof
 
 :import_ClassicContextMenu
 rem          Restore the classic context menu
-reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
-goto :eof
+set "win11arg=reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve" & call :win_ver & goto :eof
 
 :import_SuggestWays
 rem          Disable "Suggest ways to get the most out of Windows and finish setting up this device"
