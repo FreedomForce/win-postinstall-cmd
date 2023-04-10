@@ -18,9 +18,9 @@ set "winget_file=%Temp%\winget.json"
 :menu
 cls & call :delete
 %print% SELECT YOUR TASK: & echo.
-echo: [1] TWEAKS
-echo: [2] IMPORT SETTINGS
-echo: [3] INSTALL APPLICATIONS
+echo: [1] Tweaks
+echo: [2] Import settings
+echo: [3] Install applications
 
 set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
 if %number%==1 goto :tweaks
@@ -30,12 +30,12 @@ if %number%==3 goto :wingetmenu
 rem                     FIRST CHAPTER - UPDATES AND USER SETTINGS
 :tweaks
 cls & %print% SELECT YOUR TASK: & echo.
-echo: [1] CHECK IF WINGET IS INSTALLED
-echo: [2] CHECK FOR UPDATES
-echo: [3] DISABLE HIBERNATE
-echo: [4] DISABLE PASSWORD EXPIRATION
-echo: [5] OPEN OLD MIXER
-%print% [0] GO BACK
+echo: [1] Check if winget is installed
+echo: [2] Check for updates
+echo: [3] Disable hibernate
+echo: [4] Disable password expiration
+echo: [5] Open old mixer
+%print% [0] Go back
 
 set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
 if %number%==0 goto :menu
@@ -83,7 +83,7 @@ echo: [21] Restore the classic context menu (Win11)            [22] Disable "Sug
 echo: [23] Disable "Windows Experience ..."                    [24] Disable "Get tips and suggestions when using Windows"
 echo: [25] Enable NumLock by default                           [26] Disable ease of access settings (Narrator + Sticky Keys)
 echo: [27] Enable file explorer checkboxes                     [28] Enable "Let me use a different input method for each app window"
-%print% [0] GO BACK & echo [*] SELECT ALL & echo [/] RESTORE SETTINGS
+%print% [0] Go back & echo [*] Select all & echo [/] Restore settings
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 if %symbol%==/  goto :registry_restore
@@ -311,7 +311,7 @@ echo: [21] Enable "Suggest ways to get the most out of Windows..."              
 echo: [23] Enable "Get tips and suggestions when using Windows"                 [24] Disable NumLock by default
 echo: [25] Enable ease of access settings (Narrator + Sticky Keys)              [26] Disable file explorer checkboxes
 echo: [27] Disable "Let me use a different input method for each app window"
-%print% [0] GO BACK & echo [*] SELECT ALL
+%print% [0] Go back & echo [*] Select all
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 if %symbol%==*  goto :registry_restore_all_keys
@@ -529,8 +529,8 @@ echo: [22] VLC                        [23] Chocolatey GUI             [24] AutoH
 echo: [25] Wireshark                  [26] GIMP                       [27] ShareX
 echo: [28] LibreOffice                [29] Sumatra PDF                [30] VirtualBox
 echo: [31] Visual Studio Code
-%print% [*] INSTALL SELECTED APP/APPS & echo [+] CHECK FOR UPDATES & echo [0] GO BACK
-if exist %app_list% echo [/] CLEAR LIST OF SELECTED APPS & echo %breakline% & %print% SELECTED APPS: & type %app_list% 2>nul
+%print% [*] Install selected app/apps & echo [+] Check for updates & echo [0] Go back
+if exist %app_list% echo [/] Clear list of selected apps & echo %breakline% & %print% Selected apps: & type %app_list% 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 if %symbol%==+  goto :checkForUpdates
@@ -578,7 +578,7 @@ pause & goto :wingetmenu
 call :delete
 echo {>> %winget_file%
 echo    "$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> %winget_file%
-echo    "CreationDate" : "2023-03",>> %winget_file%
+echo    "CreationDate" : "2023-04",>> %winget_file%
 echo    "Sources" : >> %winget_file%
 echo    [>> %winget_file%
 echo        {>> %winget_file%
@@ -801,46 +801,54 @@ call :winget_app & call :app_list_txt & goto :eof
 
 :endofthewingetfile
 if not exist %app_list% goto :eof
-echo            ],>> %winget_file%
-echo            "SourceDetails" : >> %winget_file%
-echo            {>> %winget_file%
-echo                "Argument" : "https://winget.azureedge.net/cache",>> %winget_file%
-echo                "Identifier" : "Microsoft.Winget.Source_8wekyb3d8bbwe",>> %winget_file%
-echo                "Name" : "winget",>> %winget_file%
-echo                "Type" : "Microsoft.PreIndexed.Package">> %winget_file%
-echo            }>> %winget_file%
-echo        }>> %winget_file%
-echo    ]>> %winget_file%
-echo }>> %winget_file%
+(
+    echo            ],
+    echo            "SourceDetails" : {
+    echo                "Argument" : "https://winget.azureedge.net/cache",
+    echo                "Identifier" : "Microsoft.Winget.Source_8wekyb3d8bbwe",
+    echo                "Name" : "winget",
+    echo                "Type" : "Microsoft.PreIndexed.Package"
+    echo            }
+    echo        }
+    echo    ]
+    echo }
+) >> %winget_file%
 
 echo %breakline% & %print% PRESS ANY KEY TO INSTALL SELECTED APP/APPS & pause
 winget import -i %winget_file% --accept-source-agreements --accept-package-agreements
 pause & call :delete & goto :wingetmenu
 
 :winget_app
-if exist %winget_file% find /c "%wingetapp%" %winget_file% >nul 2>&1 && goto :eof
-echo                {>> %winget_file%
-echo                    "PackageIdentifier" : "%wingetapp%">> %winget_file%
-echo                },>> %winget_file%
+findstr /i /c:"%wingetapp%" %winget_file% >nul 2>&1 && goto :eof
+(
+    echo                {
+    echo                    "PackageIdentifier" : "%wingetapp%"
+    echo                },
+) >> %winget_file%
 goto :eof
 
 :app_list_txt
-if not exist %app_list% echo %app_added%>> %app_list%
-if exist %app_list% find /c "%app_added%" %app_list% >nul 2>&1 && goto :eof || echo %app_added%>> %app_list%
+if not exist %app_list% (
+    echo %app_added%>> %app_list%
+) else (
+    findstr /i /c:"%app_added%" %app_list% >nul 2>&1 || echo %app_added%>> %app_list%
+) 
 goto :eof
 
 :delete
-if exist %winget_file% del %winget_file% >nul 2>&1 & del %app_list% >nul 2>&1 & rmdir /s /q %Temp%\WinGet\ >nul 2>&1
+if exist %winget_file% (
+    del %winget_file% >nul 2>&1
+    del %app_list% >nul 2>&1
+    rmdir /s /q %Temp%\WinGet\ >nul 2>&1
+) 
 goto :eof
 
 :win_ver
 set Version=
-
 for /f "tokens=2 delims==" %%a in ('wmic os get Caption /value') do set Version=%%a
-
 if "%Version:~0,20%%"=="Microsoft Windows 10" (
     %win10arg%
 ) else "%Version:~0,20%"=="Microsoft Windows 11" (
     %win11arg%
-)
+) 
 goto :eof
