@@ -1,5 +1,5 @@
 @echo off
-rem                      https://github.com/FreedomForce/win-postinstall-cmd
+rem                     https://github.com/FreedomForce/win-postinstall-cmd
 
 
 title win-postinstall-cmd
@@ -8,9 +8,14 @@ setlocal EnableDelayedExpansion
 mode con: cols=145 lines=30
 title win-postinstall-cmd
 cd /d %~dp0
+
 rem                     variables
+rem set "env=debug"
+rem "output=%Temp%\wpc_debug.txt"
 set "breakline=__________________________________________________________________________________________"
 set "print=echo. & echo"
+set "mute=>nul 2>&1"
+
 rem                     winget_variables
 set "app_list=%Temp%\selected-apps.txt"
 set "winget_file=%Temp%\winget.json"
@@ -89,34 +94,34 @@ set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL:
 if %symbol%==/  goto :registry_restore
 if %symbol%==*  goto :registry_all_keys
 if %symbol%==0  call :menu
-if %symbol%==1  call :import_chat                       >nul 2>&1
-if %symbol%==2  call :import_cortana_icon               >nul 2>&1
-if %symbol%==3  call :import_TaskView_icon              >nul 2>&1
-if %symbol%==4  call :import_search_icon                >nul 2>&1
-if %symbol%==5  call :import_meet_icon                  >nul 2>&1
-if %symbol%==6  call :import_NewsAndInterests_icon      >nul 2>&1
-if %symbol%==7  call :import_TaskbarPins                >nul 2>&1
-if %symbol%==8  call :import_WidgetsFromTheTaskbar_icon >nul 2>&1
-if %symbol%==9  call :import_MostUsedList               >nul 2>&1
-if %symbol%==10 call :import_ShowRecentlyAddedApps      >nul 2>&1
-if %symbol%==11 call :import_ShowRecentlyOpened         >nul 2>&1
-if %symbol%==12 call :import_CompactMode                >nul 2>&1
-if %symbol%==13 call :import_OpenFileExplorer           >nul 2>&1
-if %symbol%==14 call :import_FileNameExtensions         >nul 2>&1
-if %symbol%==15 call :import_SoundCommunications        >nul 2>&1
-if %symbol%==16 call :import_StartupSound               >nul 2>&1
-if %symbol%==17 call :import_EnhancePointerPrecision    >nul 2>&1
-if %symbol%==18 call :import_AutomaticMaintenance       >nul 2>&1
-if %symbol%==19 call :import_UseMySignInInfo            >nul 2>&1
-if %symbol%==20 call :import_AltTab                     >nul 2>&1
-if %symbol%==21 call :import_ClassicContextMenu         >nul 2>&1
-if %symbol%==22 call :import_SuggestWays                >nul 2>&1
-if %symbol%==23 call :import_WindowsExperience          >nul 2>&1
-if %symbol%==24 call :import_TipsAndSuggestions         >nul 2>&1
-if %symbol%==25 call :import_NumLock                    >nul 2>&1
-if %symbol%==26 call :import_EaseOfAccessSettings       >nul 2>&1
-if %symbol%==27 call :import_CheckBoxes                 >nul 2>&1
-if %symbol%==28 call :import_DifferentInputMethod       >nul 2>&1
+if %symbol%==1  call :import_chat                       %mute%
+if %symbol%==2  call :import_cortana_icon               %mute%
+if %symbol%==3  call :import_TaskView_icon              %mute%
+if %symbol%==4  call :import_search_icon                %mute%
+if %symbol%==5  call :import_meet_icon                  %mute%
+if %symbol%==6  call :import_NewsAndInterests_icon      %mute%
+if %symbol%==7  call :import_TaskbarPins                %mute%
+if %symbol%==8  call :import_WidgetsFromTheTaskbar_icon %mute%
+if %symbol%==9  call :import_MostUsedList               %mute%
+if %symbol%==10 call :import_ShowRecentlyAddedApps      %mute%
+if %symbol%==11 call :import_ShowRecentlyOpened         %mute%
+if %symbol%==12 call :import_CompactMode                %mute%
+if %symbol%==13 call :import_OpenFileExplorer           %mute%
+if %symbol%==14 call :import_FileNameExtensions         %mute%
+if %symbol%==15 call :import_SoundCommunications        %mute%
+if %symbol%==16 call :import_StartupSound               %mute%
+if %symbol%==17 call :import_EnhancePointerPrecision    %mute%
+if %symbol%==18 call :import_AutomaticMaintenance       %mute%
+if %symbol%==19 call :import_UseMySignInInfo            %mute%
+if %symbol%==20 call :import_AltTab                     %mute%
+if %symbol%==21 call :import_ClassicContextMenu         %mute%
+if %symbol%==22 call :import_SuggestWays                %mute%
+if %symbol%==23 call :import_WindowsExperience          %mute%
+if %symbol%==24 call :import_TipsAndSuggestions         %mute%
+if %symbol%==25 call :import_NumLock                    %mute%
+if %symbol%==26 call :import_EaseOfAccessSettings       %mute%
+if %symbol%==27 call :import_CheckBoxes                 %mute%
+if %symbol%==28 call :import_DifferentInputMethod       %mute%
 goto :registry
 
 :import_chat
@@ -265,34 +270,34 @@ reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t R
 goto :eof
 
 :registry_all_keys
-call :import_chat                       >nul 2>&1
-call :import_cortana_icon               >nul 2>&1
-call :import_TaskView_icon              >nul 2>&1
-call :import_search_icon                >nul 2>&1
-call :import_meet_icon                  >nul 2>&1
-call :import_NewsAndInterests_icon      >nul 2>&1
-call :import_TaskbarPins                >nul 2>&1
-call :import_WidgetsFromTheTaskbar_icon >nul 2>&1
-call :import_MostUsedList               >nul 2>&1
-call :import_ShowRecentlyAddedApps      >nul 2>&1
-call :import_ShowRecentlyOpened         >nul 2>&1
-call :import_CompactMode                >nul 2>&1
-call :import_OpenFileExplorer           >nul 2>&1
-call :import_FileNameExtensions         >nul 2>&1
-call :import_SoundCommunications        >nul 2>&1
-call :import_StartupSound               >nul 2>&1
-call :import_EnhancePointerPrecision    >nul 2>&1
-call :import_AutomaticMaintenance       >nul 2>&1
-call :import_UseMySignInInfo            >nul 2>&1
-call :import_AltTab                     >nul 2>&1
-call :import_ClassicContextMenu         >nul 2>&1
-call :import_SuggestWays                >nul 2>&1
-call :import_WindowsExperience          >nul 2>&1
-call :import_TipsAndSuggestions         >nul 2>&1
-call :import_NumLock                    >nul 2>&1
-call :import_EaseOfAccessSettings       >nul 2>&1
-call :import_CheckBoxes                 >nul 2>&1
-call :import_DifferentInputMethod       >nul 2>&1
+call :import_chat                       %mute%
+call :import_cortana_icon               %mute%
+call :import_TaskView_icon              %mute%
+call :import_search_icon                %mute%
+call :import_meet_icon                  %mute%
+call :import_NewsAndInterests_icon      %mute%
+call :import_TaskbarPins                %mute%
+call :import_WidgetsFromTheTaskbar_icon %mute%
+call :import_MostUsedList               %mute%
+call :import_ShowRecentlyAddedApps      %mute%
+call :import_ShowRecentlyOpened         %mute%
+call :import_CompactMode                %mute%
+call :import_OpenFileExplorer           %mute%
+call :import_FileNameExtensions         %mute%
+call :import_SoundCommunications        %mute%
+call :import_StartupSound               %mute%
+call :import_EnhancePointerPrecision    %mute%
+call :import_AutomaticMaintenance       %mute%
+call :import_UseMySignInInfo            %mute%
+call :import_AltTab                     %mute%
+call :import_ClassicContextMenu         %mute%
+call :import_SuggestWays                %mute%
+call :import_WindowsExperience          %mute%
+call :import_TipsAndSuggestions         %mute%
+call :import_NumLock                    %mute%
+call :import_EaseOfAccessSettings       %mute%
+call :import_CheckBoxes                 %mute%
+call :import_DifferentInputMethod       %mute%
 goto :registry
 
 :registry_restore
@@ -316,33 +321,33 @@ echo: [27] Disable "Let me use a different input method for each app window"
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 if %symbol%==*  goto :registry_restore_all_keys
 if %symbol%==0  goto :registry
-if %symbol%==1  call :restore_chat                       >nul 2>&1
-if %symbol%==2  call :restore_cortana_icon               >nul 2>&1
-if %symbol%==3  call :restore_TaskView_icon              >nul 2>&1
-if %symbol%==4  call :restore_search_icon                >nul 2>&1
-if %symbol%==5  call :restore_meet_icon                  >nul 2>&1
-if %symbol%==6  call :restore_NewsAndInterests_icon      >nul 2>&1
-if %symbol%==7  call :restore_WidgetsFromTheTaskbar_icon >nul 2>&1
-if %symbol%==8  call :restore_MostUsedList               >nul 2>&1
-if %symbol%==9  call :restore_ShowRecentlyAddedApps      >nul 2>&1
-if %symbol%==10 call :restore_ShowRecentlyOpened         >nul 2>&1
-if %symbol%==11 call :restore_CompactMode                >nul 2>&1
-if %symbol%==12 call :restore_OpenFileExplorer           >nul 2>&1
-if %symbol%==13 call :restore_FileNameExtensions         >nul 2>&1
-if %symbol%==14 call :restore_SoundCommunications        >nul 2>&1
-if %symbol%==15 call :restore_StartupSound               >nul 2>&1
-if %symbol%==16 call :restore_EnhancePointerPrecision    >nul 2>&1
-if %symbol%==17 call :restore_AutomaticMaintenance       >nul 2>&1
-if %symbol%==18 call :restore_UseMySignInInfo            >nul 2>&1
-if %symbol%==19 call :restore_AltTab                     >nul 2>&1
-if %symbol%==20 call :restore_ClassicContextMenu         >nul 2>&1
-if %symbol%==21 call :restore_SuggestWays                >nul 2>&1
-if %symbol%==22 call :restore_WindowsExperience          >nul 2>&1
-if %symbol%==23 call :restore_TipsAndSuggestions         >nul 2>&1
-if %symbol%==24 call :restore_NumLock                    >nul 2>&1
-if %symbol%==25 call :restore_EaseOfAccessSettings       >nul 2>&1
-if %symbol%==26 call :restore_CheckBoxes                 >nul 2>&1
-if %symbol%==27 call :restore_DifferentInputMethod       >nul 2>&1
+if %symbol%==1  call :restore_chat                       %mute%
+if %symbol%==2  call :restore_cortana_icon               %mute%
+if %symbol%==3  call :restore_TaskView_icon              %mute%
+if %symbol%==4  call :restore_search_icon                %mute%
+if %symbol%==5  call :restore_meet_icon                  %mute%
+if %symbol%==6  call :restore_NewsAndInterests_icon      %mute%
+if %symbol%==7  call :restore_WidgetsFromTheTaskbar_icon %mute%
+if %symbol%==8  call :restore_MostUsedList               %mute%
+if %symbol%==9  call :restore_ShowRecentlyAddedApps      %mute%
+if %symbol%==10 call :restore_ShowRecentlyOpened         %mute%
+if %symbol%==11 call :restore_CompactMode                %mute%
+if %symbol%==12 call :restore_OpenFileExplorer           %mute%
+if %symbol%==13 call :restore_FileNameExtensions         %mute%
+if %symbol%==14 call :restore_SoundCommunications        %mute%
+if %symbol%==15 call :restore_StartupSound               %mute%
+if %symbol%==16 call :restore_EnhancePointerPrecision    %mute%
+if %symbol%==17 call :restore_AutomaticMaintenance       %mute%
+if %symbol%==18 call :restore_UseMySignInInfo            %mute%
+if %symbol%==19 call :restore_AltTab                     %mute%
+if %symbol%==20 call :restore_ClassicContextMenu         %mute%
+if %symbol%==21 call :restore_SuggestWays                %mute%
+if %symbol%==22 call :restore_WindowsExperience          %mute%
+if %symbol%==23 call :restore_TipsAndSuggestions         %mute%
+if %symbol%==24 call :restore_NumLock                    %mute%
+if %symbol%==25 call :restore_EaseOfAccessSettings       %mute%
+if %symbol%==26 call :restore_CheckBoxes                 %mute%
+if %symbol%==27 call :restore_DifferentInputMethod       %mute%
 goto :registry_restore
 
 :restore_chat
@@ -486,53 +491,63 @@ reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t R
 goto :eof
 
 :registry_restore_all_keys
-call :restore_chat                       >nul 2>&1
-call :restore_cortana_icon               >nul 2>&1
-call :restore_TaskView_icon              >nul 2>&1
-call :restore_search_icon                >nul 2>&1
-call :restore_meet_icon                  >nul 2>&1
-call :restore_NewsAndInterests_icon      >nul 2>&1
-call :restore_WidgetsFromTheTaskbar_icon >nul 2>&1
-call :restore_MostUsedList               >nul 2>&1
-call :restore_ShowRecentlyAddedApps      >nul 2>&1
-call :restore_ShowRecentlyOpened         >nul 2>&1
-call :restore_CompactMode                >nul 2>&1
-call :restore_OpenFileExplorer           >nul 2>&1
-call :restore_FileNameExtensions         >nul 2>&1
-call :restore_SoundCommunications        >nul 2>&1
-call :restore_StartupSound               >nul 2>&1
-call :restore_EnhancePointerPrecision    >nul 2>&1
-call :restore_AutomaticMaintenance       >nul 2>&1
-call :restore_UseMySignInInfo            >nul 2>&1
-call :restore_AltTab                     >nul 2>&1
-call :restore_ClassicContextMenu         >nul 2>&1
-call :restore_SuggestWays                >nul 2>&1
-call :restore_WindowsExperience          >nul 2>&1
-call :restore_TipsAndSuggestions         >nul 2>&1
-call :restore_NumLock                    >nul 2>&1
-call :restore_EaseOfAccessSettings       >nul 2>&1
-call :restore_CheckBoxes                 >nul 2>&1
-call :restore_DifferentInputMethod       >nul 2>&1
+call :restore_chat                       %mute%
+call :restore_cortana_icon               %mute%
+call :restore_TaskView_icon              %mute%
+call :restore_search_icon                %mute%
+call :restore_meet_icon                  %mute%
+call :restore_NewsAndInterests_icon      %mute%
+call :restore_WidgetsFromTheTaskbar_icon %mute%
+call :restore_MostUsedList               %mute%
+call :restore_ShowRecentlyAddedApps      %mute%
+call :restore_ShowRecentlyOpened         %mute%
+call :restore_CompactMode                %mute%
+call :restore_OpenFileExplorer           %mute%
+call :restore_FileNameExtensions         %mute%
+call :restore_SoundCommunications        %mute%
+call :restore_StartupSound               %mute%
+call :restore_EnhancePointerPrecision    %mute%
+call :restore_AutomaticMaintenance       %mute%
+call :restore_UseMySignInInfo            %mute%
+call :restore_AltTab                     %mute%
+call :restore_ClassicContextMenu         %mute%
+call :restore_SuggestWays                %mute%
+call :restore_WindowsExperience          %mute%
+call :restore_TipsAndSuggestions         %mute%
+call :restore_NumLock                    %mute%
+call :restore_EaseOfAccessSettings       %mute%
+call :restore_CheckBoxes                 %mute%
+call :restore_DifferentInputMethod       %mute%
 goto :registry_restore
 
 rem                     THIRD CHAPTER - WINGET
 :wingetmenu
 cls & %print% SELECT WHAT TO INSTALL: & echo.
-echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox (ESR)
+echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox ESR
 echo: [4] Chrome                      [5] Notepad++                   [6] Discord
 echo: [7] Parsec                      [8] Steam                       [9] Epic Games Launcher
 echo: [10] Blender                    [11] Microsoft Teams            [12] OBS Studio
 echo: [13] Zero Tier One              [14] qBittorrent                [15] Sandboxie Plus
 echo: [16] Viber                      [17] JavaRE                     [18] PowerToys
-echo: [19] KeePass                    [20] Malwarebytes               [21] Zoom
-echo: [22] VLC                        [23] Chocolatey GUI             [24] AutoHotkey
-echo: [25] Wireshark                  [26] GIMP                       [27] ShareX
-echo: [28] LibreOffice                [29] Sumatra PDF                [30] VirtualBox
-echo: [31] Visual Studio Code
+echo: [19] KeePass                    [20] Zoom                       [21] VLC
+echo: [22] Chocolatey GUI             [23] AutoHotkey                 [24] Wireshark
+echo: [25] GIMP                       [26] ShareX                     [27] LibreOffice
+echo: [28] Sumatra PDF                [29] VirtualBox                 [30] Visual Studio Code
 %print% [*] Install selected app/apps & echo [+] Check for updates & echo [0] Go back
 if exist %app_list% echo [/] Clear list of selected apps & echo %breakline% & %print% Selected apps: & type %app_list% 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
+
+if "%env%"=="debug" (
+for /L %%i in (1,1,31) do (
+    set "symbol=%%i"
+    call :app_select
+    )
+    call :endofthewingetfile
+    goto :wingetmenu
+)
+
+:app_select
 if %symbol%==+  goto :checkForUpdates
 if %symbol%==*  call :endofthewingetfile
 if %symbol%==/  call :startofthewingetfile
@@ -556,19 +571,19 @@ if %symbol%==16 call :Viber
 if %symbol%==17 call :JavaRE
 if %symbol%==18 call :PowerToys
 if %symbol%==19 call :KeePass
-if %symbol%==20 call :Malwarebytes
-if %symbol%==21 call :Zoom
-if %symbol%==22 call :VLC
-if %symbol%==23 call :ChocolateyGUI
-if %symbol%==24 call :AutoHotkey
-if %symbol%==25 call :Wireshark
-if %symbol%==26 call :GIMP
-if %symbol%==27 call :ShareX
-if %symbol%==28 call :LibreOffice
-if %symbol%==29 call :SumatraPDF
-if %symbol%==30 call :VirtualBox
-if %symbol%==31 call :VisualStudioCode
-goto :wingetmenu
+if %symbol%==20 call :Zoom
+if %symbol%==21 call :VLC
+if %symbol%==22 call :ChocolateyGUI
+if %symbol%==23 call :AutoHotkey
+if %symbol%==24 call :Wireshark
+if %symbol%==25 call :GIMP
+if %symbol%==26 call :ShareX
+if %symbol%==27 call :LibreOffice
+if %symbol%==28 call :SumatraPDF
+if %symbol%==29 call :VirtualBox
+if %symbol%==30 call :VisualStudioCode
+if "%env%"=="debug" goto :eof
+if NOT "%env%"=="debug" goto :wingetmenu
 
 :checkForUpdates
 winget upgrade --accept-source-agreements --all
@@ -587,7 +602,7 @@ echo            [>> %winget_file%
 goto :eof
 
 :CPPRedist
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=C++ Redistributable 2005, 2008, 2012, 2013, 2015+ added"
 set wingetapp=Microsoft.VCRedist.2008.x86
 call :winget_app & call :app_list_txt
@@ -611,126 +626,120 @@ set wingetapp=Microsoft.VCRedist.2013.x86
 call :winget_app & goto :eof
 
 :7zip
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=7zip added"
 set wingetapp=7zip.7zip
 call :winget_app & call :app_list_txt & goto :eof
 
 :FirefoxESR
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
-set "app_added=Firefox (ESR) added"
+if not exist %winget_file% call :startofthewingetfile %mute%
+set "app_added=Firefox ESR added"
 set wingetapp=Mozilla.Firefox.ESR
 call :winget_app & call :app_list_txt & goto :eof
 
 :Chrome
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Chrome added"
 set wingetapp=Google.Chrome
 call :winget_app & call :app_list_txt & goto :eof
 
 :NotepadPP
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Notepad++ added"
 set wingetapp=Notepad++.Notepad++
 call :winget_app & call :app_list_txt & goto :eof
 
 :Discord
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Discord added"
 set wingetapp=Discord.Discord
 call :winget_app & call :app_list_txt & goto :eof
 
 :Parsec
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Parsec added"
 set wingetapp=Parsec.Parsec
 call :winget_app & call :app_list_txt & goto :eof
 
 :Steam
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Steam added"
 set wingetapp=Valve.Steam
 call :winget_app & call :app_list_txt & goto :eof
 
 :EpicGamesLauncher
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Epic Games Launcher added"
 set wingetapp=EpicGames.EpicGamesLauncher
 call :winget_app & call :app_list_txt & goto :eof
 
 :Blender
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Blender added"
 set wingetapp=BlenderFoundation.Blender
 call :winget_app & call :app_list_txt & goto :eof
 
 :MicrosoftTeams
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Microsoft Teams added"
 set wingetapp=Microsoft.Teams
 call :winget_app & call :app_list_txt & goto :eof
 
 :OBSStudio
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=OBS Studio added"
 set wingetapp=OBSProject.OBSStudio
 call :winget_app & call :app_list_txt & goto :eof
 
 :ZeroTierOne
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Zero Tier One added"
 call :winget_app & call :app_list_txt & goto :eof
 
 :qBittorrent
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=qBittorrent added"
 set wingetapp=qBittorrent.qBittorrent
 call :winget_app & call :app_list_txt & goto :eof
 
 :SandboxiePlus
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Sandboxie Plus added"
 set wingetapp=Sandboxie.Plus
 call :winget_app & call :app_list_txt & goto :eof
 
 :Viber
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Viber added"
 set wingetapp=Viber.Viber
 call :winget_app & call :app_list_txt & goto :eof
 
 :JavaRE
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Java added"
 set wingetapp=Oracle.JavaRuntimeEnvironment
 call :winget_app & call :app_list_txt & goto :eof
 
 :PowerToys
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=PowerToys added"
 set wingetapp=Microsoft.PowerToys
 call :winget_app & call :app_list_txt & goto :eof
 
 :KeePass
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=KeePass added"
 set wingetapp=DominikReichl.KeePass
 call :winget_app & call :app_list_txt & goto :eof
 
-:Malwarebytes
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
-set "app_added=Malwarebytes added"
-set wingetapp=Malwarebytes.Malwarebytes
-call :winget_app & call :app_list_txt & goto :eof
-
 :Zoom
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Zoom added"
 set wingetapp=Zoom.Zoom
 call :winget_app & call :app_list_txt & goto :eof
 
 :VLC
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=VLC added"
 set wingetapp=VideoLAN.VLC
 call :winget_app & call :app_list_txt & goto :eof
@@ -746,55 +755,55 @@ powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.Service
 goto :ChocolateyGUIcontinue
 
 :ChocolateyGUIcontinue
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Chocolatey GUI added"
 set wingetapp=Chocolatey.ChocolateyGUI
 call :winget_app & call :app_list_txt & goto :eof
 
 :AutoHotkey
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=AutoHotkey added"
-set wingetapp=Lexikos.AutoHotkey
+set wingetapp=AutoHotkey.AutoHotkey
 call :winget_app & call :app_list_txt & goto :eof
 
 :Wireshark
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Wireshark added"
 set wingetapp=WiresharkFoundation.Wireshark
 call :winget_app & call :app_list_txt & goto :eof
 
 :GIMP
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=GIMP added"
 set wingetapp=GIMP.GIMP
 call :winget_app & call :app_list_txt & goto :eof
 
 :ShareX
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=ShareX added"
 set wingetapp=ShareX.ShareX
 call :winget_app & call :app_list_txt & goto :eof
 
 :LibreOffice
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=LibreOffice added"
 set wingetapp=TheDocumentFoundation.LibreOffice
 call :winget_app & call :app_list_txt & goto :eof
 
-:SumatraPDF.SumatraPDF
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+:SumatraPDF
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Sumatra PDF added"
 set wingetapp=SumatraPDF.SumatraPDF
 call :winget_app & call :app_list_txt & goto :eof
 
 :VirtualBox
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=VirtualBox added"
 set wingetapp=Oracle.VirtualBox
 call :winget_app & call :app_list_txt & goto :eof
 
 :VisualStudioCode
-if not exist %winget_file% call :startofthewingetfile >nul 2>&1
+if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Visual Studio Code added"
 set wingetapp=Microsoft.VisualStudioCode
 call :winget_app & call :app_list_txt & goto :eof
@@ -819,7 +828,7 @@ winget import -i %winget_file% --accept-source-agreements --accept-package-agree
 pause & call :delete & goto :wingetmenu
 
 :winget_app
-findstr /i /c:"%wingetapp%" %winget_file% >nul 2>&1 && goto :eof
+findstr /i /c:"%wingetapp%" %winget_file% %mute% && goto :eof
 (
     echo                {
     echo                    "PackageIdentifier" : "%wingetapp%"
@@ -831,15 +840,15 @@ goto :eof
 if not exist %app_list% (
     echo %app_added%>> %app_list%
 ) else (
-    findstr /i /c:"%app_added%" %app_list% >nul 2>&1 || echo %app_added%>> %app_list%
+    findstr /i /c:"%app_added%" %app_list% %mute% || echo %app_added%>> %app_list%
 ) 
 goto :eof
 
 :delete
 if exist %winget_file% (
-    del %winget_file% >nul 2>&1
-    del %app_list% >nul 2>&1
-    rmdir /s /q %Temp%\WinGet\ >nul 2>&1
+    del %winget_file% %mute%
+    del %app_list% %mute%
+    rmdir /s /q %Temp%\WinGet\ %mute%
 ) 
 goto :eof
 
