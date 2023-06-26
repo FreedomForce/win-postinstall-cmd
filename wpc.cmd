@@ -10,7 +10,7 @@ title win-postinstall-cmd
 cd /d %~dp0
 
 rem                     variables
-rem set "env=debug"
+rem set "env=debug" & @echo on
 rem "output=%Temp%\wpc_debug.txt"
 set "breakline=__________________________________________________________________________________________"
 set "print=echo. & echo"
@@ -91,6 +91,8 @@ echo: [27] Enable file explorer checkboxes                     [28] Enable "Let 
 %print% [0] Go back & echo [*] Select all & echo [/] Restore settings
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
+
+:reg_imp_select
 if %symbol%==/  goto :registry_restore
 if %symbol%==*  goto :registry_all_keys
 if %symbol%==0  call :menu
@@ -122,6 +124,16 @@ if %symbol%==25 call :import_NumLock                    %mute%
 if %symbol%==26 call :import_EaseOfAccessSettings       %mute%
 if %symbol%==27 call :import_CheckBoxes                 %mute%
 if %symbol%==28 call :import_DifferentInputMethod       %mute%
+if "%loop%"=="1" goto :eof
+if NOT "%loop%"=="1" goto :registry
+
+:registry_all_keys
+set "loop=1"
+for /L %%i in (1,1,28) do (
+    set "symbol=%%i"
+    call :reg_imp_select
+)
+set "loop=0"
 goto :registry
 
 :import_chat
@@ -173,7 +185,10 @@ goto :eof
 :import_ShowRecentlyAddedApps
 rem          Disable show recently added apps
 set "win10arg=reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001" & call :win_ver
-set "win10arg=reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001" & call :win_ver & goto :eof
+set "win10arg= "
+set "win10arg=reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001" & call :win_ver
+set "win10arg= "
+goto :eof
 
 :import_ShowRecentlyOpened
 rem          Disable show recently opened items in start, jump lists and file explorer
@@ -229,7 +244,9 @@ goto :eof
 
 :import_ClassicContextMenu
 rem          Restore the classic context menu
-set "win11arg=reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve" & call :win_ver & goto :eof
+set "win11arg=reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve" & call :win_ver
+set "win11arg= "
+goto :eof
 
 :import_SuggestWays
 rem          Disable "Suggest ways to get the most out of Windows and finish setting up this device"
@@ -269,37 +286,6 @@ rem          Let me use a different input method for each app window
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e068092000000
 goto :eof
 
-:registry_all_keys
-call :import_chat                       %mute%
-call :import_cortana_icon               %mute%
-call :import_TaskView_icon              %mute%
-call :import_search_icon                %mute%
-call :import_meet_icon                  %mute%
-call :import_NewsAndInterests_icon      %mute%
-call :import_TaskbarPins                %mute%
-call :import_WidgetsFromTheTaskbar_icon %mute%
-call :import_MostUsedList               %mute%
-call :import_ShowRecentlyAddedApps      %mute%
-call :import_ShowRecentlyOpened         %mute%
-call :import_CompactMode                %mute%
-call :import_OpenFileExplorer           %mute%
-call :import_FileNameExtensions         %mute%
-call :import_SoundCommunications        %mute%
-call :import_StartupSound               %mute%
-call :import_EnhancePointerPrecision    %mute%
-call :import_AutomaticMaintenance       %mute%
-call :import_UseMySignInInfo            %mute%
-call :import_AltTab                     %mute%
-call :import_ClassicContextMenu         %mute%
-call :import_SuggestWays                %mute%
-call :import_WindowsExperience          %mute%
-call :import_TipsAndSuggestions         %mute%
-call :import_NumLock                    %mute%
-call :import_EaseOfAccessSettings       %mute%
-call :import_CheckBoxes                 %mute%
-call :import_DifferentInputMethod       %mute%
-goto :registry
-
 :registry_restore
 cls & %print% SELECT YOUR TASK: & echo.
 echo: [1] Restore chat on taskbar                                               [2] Restore Cortana on taskbar 
@@ -319,6 +305,8 @@ echo: [27] Disable "Let me use a different input method for each app window"
 %print% [0] Go back & echo [*] Select all
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
+
+:reg_res_select
 if %symbol%==*  goto :registry_restore_all_keys
 if %symbol%==0  goto :registry
 if %symbol%==1  call :restore_chat                       %mute%
@@ -348,6 +336,16 @@ if %symbol%==24 call :restore_NumLock                    %mute%
 if %symbol%==25 call :restore_EaseOfAccessSettings       %mute%
 if %symbol%==26 call :restore_CheckBoxes                 %mute%
 if %symbol%==27 call :restore_DifferentInputMethod       %mute%
+if "%loop%"=="1" goto :eof
+if NOT "%loop%"=="1" goto :registry_restore
+
+:registry_restore_all_keys
+set "loop=1"
+for /L %%i in (1,1,27) do (
+    set "symbol=%%i"
+    call :reg_res_select
+)
+set "loop=0"
 goto :registry_restore
 
 :restore_chat
@@ -475,7 +473,8 @@ goto :eof
 
 :restore_EaseOfAccessSettings
 rem          Enable ease of access settings (Narrator + Sticky Keys)
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /ve
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /v selfvoice
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Ease of Access" /f /v selfscan
 reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys" /f /v Flags /t REG_SZ /d 510
 reg add "HKEY_CURRENT_USER\Control Panel\Accessibility\ToggleKeys" /f /v Flags /t REG_SZ /d 62
 goto :eof
@@ -489,36 +488,6 @@ goto :eof
 rem          Disable "Let me use a different input method for each app window"
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e078012000000
 goto :eof
-
-:registry_restore_all_keys
-call :restore_chat                       %mute%
-call :restore_cortana_icon               %mute%
-call :restore_TaskView_icon              %mute%
-call :restore_search_icon                %mute%
-call :restore_meet_icon                  %mute%
-call :restore_NewsAndInterests_icon      %mute%
-call :restore_WidgetsFromTheTaskbar_icon %mute%
-call :restore_MostUsedList               %mute%
-call :restore_ShowRecentlyAddedApps      %mute%
-call :restore_ShowRecentlyOpened         %mute%
-call :restore_CompactMode                %mute%
-call :restore_OpenFileExplorer           %mute%
-call :restore_FileNameExtensions         %mute%
-call :restore_SoundCommunications        %mute%
-call :restore_StartupSound               %mute%
-call :restore_EnhancePointerPrecision    %mute%
-call :restore_AutomaticMaintenance       %mute%
-call :restore_UseMySignInInfo            %mute%
-call :restore_AltTab                     %mute%
-call :restore_ClassicContextMenu         %mute%
-call :restore_SuggestWays                %mute%
-call :restore_WindowsExperience          %mute%
-call :restore_TipsAndSuggestions         %mute%
-call :restore_NumLock                    %mute%
-call :restore_EaseOfAccessSettings       %mute%
-call :restore_CheckBoxes                 %mute%
-call :restore_DifferentInputMethod       %mute%
-goto :registry_restore
 
 rem                     THIRD CHAPTER - WINGET
 :wingetmenu
@@ -539,7 +508,7 @@ if exist %app_list% echo [/] Clear list of selected apps & echo %breakline% & %p
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 
 if "%env%"=="debug" (
-for /L %%i in (1,1,31) do (
+for /L %%i in (1,1,30) do (
     set "symbol=%%i"
     call :app_select
     )
@@ -855,9 +824,12 @@ goto :eof
 :win_ver
 set Version=
 for /f "tokens=2 delims==" %%a in ('wmic os get Caption /value') do set Version=%%a
-if "%Version:~0,20%%"=="Microsoft Windows 10" (
-    %win10arg%
-) else "%Version:~0,20%"=="Microsoft Windows 11" (
-    %win11arg%
-) 
+if "%Version:~0,20%"=="Microsoft Windows 10" goto :win10cmd else goto :win11cmd
+
+:win10cmd
+%win10arg%
+goto :eof
+
+:win11cmd
+%win11arg%
 goto :eof
