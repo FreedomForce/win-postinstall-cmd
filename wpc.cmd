@@ -196,21 +196,6 @@ reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\E
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation
 goto :eof
 
-@REM set "win10arg=reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList /t REG_DWORD /d 00000001" & call :win_ver
-@REM set win10arg=
-@REM set "win11arg=reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002" & call :win_ver
-@REM set win11arg=
-@REM set "win11arg=reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps" & call :win_ver
-@REM set win11arg=
-@REM set "win11arg=reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList" & call :win_ver
-@REM set win11arg=
-@REM set "win11arg=reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation" & call :win_ver
-@REM set win11arg=
-@REM set "win11arg=reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList" & call :win_ver
-@REM set win11arg=
-@REM set "win11arg=reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation" & call :win_ver
-@REM set win11arg=
-
 :import_ShowRecentlyAddedApps
 rem          Disable show recently added apps
 if %winversion%==win10  goto :win10_RecentlyAddedApps                       %mute%
