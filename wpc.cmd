@@ -1,7 +1,6 @@
 @echo off
 rem                     https://github.com/FreedomForce/win-postinstall-cmd
 
-
 title win-postinstall-cmd
 if not "%1"=="am_admin" call powershell -h | %WINDIR%\System32\find.exe /i "powershell" > nul && if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin > nul & exit)
 setlocal EnableDelayedExpansion
@@ -15,9 +14,12 @@ rem "output=%Temp%\wpc_debug.txt"
 set "breakline=__________________________________________________________________________________________"
 set "print=echo. & echo"
 set "mute=>nul 2>&1"
+set Version=
+for /f "tokens=2 delims==" %%a in ('wmic os get Caption /value') do set Version=%%a
+if "%Version:~0,20%"=="Microsoft Windows 10" ( set "winversion=win10" ) else set "winversion=win11"
 
 rem                     winget_variables
-set "app_list=%Temp%\selected-apps.txt"
+set "app_list_file=%Temp%\selected-apps.txt"
 set "winget_file=%Temp%\winget.json"
 
 :menu
@@ -56,7 +58,7 @@ start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
 goto :tweaks
 
 :update_windows
-start ms-settings:windowsupdate-action
+start ms-settings:windowsupdate
 goto :tweaks
 
 :disable_hibernate
@@ -84,10 +86,10 @@ echo: [13] Open file explorer to - This PC                     [14] Show file na
 echo: [15] Sound communications - do nothing                   [16] Disable startup sound 
 echo: [17] Turn off enhance pointer precision                  [18] Disable automatic maintenance
 echo: [19] Disable "Use my sign in info after restart"         [20] Alt tab - open windows only
-echo: [21] Restore the classic context menu (Win11)            [22] Disable "Suggest ways to get the most out of Windows..."
-echo: [23] Disable "Windows Experience ..."                    [24] Disable "Get tips and suggestions when using Windows"
-echo: [25] Enable NumLock by default                           [26] Disable ease of access settings (Narrator + Sticky Keys)
-echo: [27] Enable file explorer checkboxes                     [28] Enable "Let me use a different input method for each app window"
+echo: [21] Disable "Suggest ways to get the most out of Win..."[22] Disable "Windows Experience ..."
+echo: [23] Disable "Get tips and suggestions when using Win..."[24] Enable NumLock by default
+echo: [25] Disable (Narrator + Sticky Keys)                    [26] Enable file explorer checkboxes
+echo: [27] Different input method for each app window
 %print% [0] Go back & echo [*] Select all & echo [/] Restore settings
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
@@ -116,14 +118,13 @@ if %symbol%==17 call :import_EnhancePointerPrecision    %mute%
 if %symbol%==18 call :import_AutomaticMaintenance       %mute%
 if %symbol%==19 call :import_UseMySignInInfo            %mute%
 if %symbol%==20 call :import_AltTab                     %mute%
-if %symbol%==21 call :import_ClassicContextMenu         %mute%
-if %symbol%==22 call :import_SuggestWays                %mute%
-if %symbol%==23 call :import_WindowsExperience          %mute%
-if %symbol%==24 call :import_TipsAndSuggestions         %mute%
-if %symbol%==25 call :import_NumLock                    %mute%
-if %symbol%==26 call :import_EaseOfAccessSettings       %mute%
-if %symbol%==27 call :import_CheckBoxes                 %mute%
-if %symbol%==28 call :import_DifferentInputMethod       %mute%
+if %symbol%==21 call :import_SuggestWays                %mute%
+if %symbol%==22 call :import_WindowsExperience          %mute%
+if %symbol%==23 call :import_TipsAndSuggestions         %mute%
+if %symbol%==24 call :import_NumLock                    %mute%
+if %symbol%==25 call :import_EaseOfAccessSettings       %mute%
+if %symbol%==26 call :import_CheckBoxes                 %mute%
+if %symbol%==27 call :import_DifferentInputMethod       %mute%
 if "%loop%"=="1" goto :eof
 if NOT "%loop%"=="1" goto :registry
 
@@ -179,15 +180,45 @@ goto :eof
 
 :import_MostUsedList
 rem          Always hide most used list in start menu
-reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002
+if %winversion%==win10  goto :win10_MostUsedList                       %mute%
+if %winversion%==win11  goto :win11_MostUsedList                       %mute%
+
+:win10_MostUsedList
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList /t REG_DWORD /d 00000001
 goto :eof
+
+:win11_MostUsedList
+reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002
+reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation
+goto :eof
+
+@REM set "win10arg=reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList /t REG_DWORD /d 00000001" & call :win_ver
+@REM set win10arg=
+@REM set "win11arg=reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps /t REG_DWORD /d 00000002" & call :win_ver
+@REM set win11arg=
+@REM set "win11arg=reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /f /v ShowOrHideMostUsedApps" & call :win_ver
+@REM set win11arg=
+@REM set "win11arg=reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList" & call :win_ver
+@REM set win11arg=
+@REM set "win11arg=reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation" & call :win_ver
+@REM set win11arg=
+@REM set "win11arg=reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList" & call :win_ver
+@REM set win11arg=
+@REM set "win11arg=reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoInstrumentation" & call :win_ver
+@REM set win11arg=
 
 :import_ShowRecentlyAddedApps
 rem          Disable show recently added apps
-set "win10arg=reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001" & call :win_ver
-set "win10arg= "
-set "win10arg=reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001" & call :win_ver
-set "win10arg= "
+if %winversion%==win10  goto :win10_RecentlyAddedApps                       %mute%
+if %winversion%==win11  goto :eof
+
+:win10_RecentlyAddedApps
+reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideRecentlyAddedApps /t REG_DWORD /d 00000001
 goto :eof
 
 :import_ShowRecentlyOpened
@@ -242,12 +273,6 @@ rem          Alt tab open windows only
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v MultiTaskingAltTabFilter /t REG_DWORD /d 00000003
 goto :eof
 
-:import_ClassicContextMenu
-rem          Restore the classic context menu
-set "win11arg=reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve" & call :win_ver
-set "win11arg= "
-goto :eof
-
 :import_SuggestWays
 rem          Disable "Suggest ways to get the most out of Windows and finish setting up this device"
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /f /v ScoobeSystemSettingEnabled /t REG_DWORD /d 00000000
@@ -297,11 +322,10 @@ echo: [11] Disable Compact Mode                                                 
 echo: [13] Disable Show file name extensions                                    [14] Restore Sound communications tab
 echo: [15] Enable startup sound                                                 [16] Restore enhance pointer precision
 echo: [17] Enable automatic maintenance                                         [18] Enable "Use my sign in info after restart"
-echo: [19] Alt tab open - Open windows and 5 most recent...                     [20] Disable the classic context menu
-echo: [21] Enable "Suggest ways to get the most out of Windows..."              [22] Enable "Windows Experience ..."
-echo: [23] Enable "Get tips and suggestions when using Windows"                 [24] Disable NumLock by default
-echo: [25] Enable ease of access settings (Narrator + Sticky Keys)              [26] Disable file explorer checkboxes
-echo: [27] Disable "Let me use a different input method for each app window"
+echo: [19] Alt tab open - Open windows and 5 most recent...                     [20] Enable "Suggest ways to get the most out of Windows..."
+echo: [21] Enable "Windows Experience ..."                                      [22] Enable "Get tips and suggestions when using Windows"
+echo: [23] Disable NumLock by default                                           [24] Enable Narrator + Sticky Keys
+echo: [25] Disable file explorer checkboxes                                     [26] Disable "Let me use a different input method for each app window"
 %print% [0] Go back & echo [*] Select all
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
@@ -328,14 +352,13 @@ if %symbol%==16 call :restore_EnhancePointerPrecision    %mute%
 if %symbol%==17 call :restore_AutomaticMaintenance       %mute%
 if %symbol%==18 call :restore_UseMySignInInfo            %mute%
 if %symbol%==19 call :restore_AltTab                     %mute%
-if %symbol%==20 call :restore_ClassicContextMenu         %mute%
-if %symbol%==21 call :restore_SuggestWays                %mute%
-if %symbol%==22 call :restore_WindowsExperience          %mute%
-if %symbol%==23 call :restore_TipsAndSuggestions         %mute%
-if %symbol%==24 call :restore_NumLock                    %mute%
-if %symbol%==25 call :restore_EaseOfAccessSettings       %mute%
-if %symbol%==26 call :restore_CheckBoxes                 %mute%
-if %symbol%==27 call :restore_DifferentInputMethod       %mute%
+if %symbol%==20 call :restore_SuggestWays                %mute%
+if %symbol%==21 call :restore_WindowsExperience          %mute%
+if %symbol%==22 call :restore_TipsAndSuggestions         %mute%
+if %symbol%==23 call :restore_NumLock                    %mute%
+if %symbol%==24 call :restore_EaseOfAccessSettings       %mute%
+if %symbol%==25 call :restore_CheckBoxes                 %mute%
+if %symbol%==26 call :restore_DifferentInputMethod       %mute%
 if "%loop%"=="1" goto :eof
 if NOT "%loop%"=="1" goto :registry_restore
 
@@ -446,11 +469,6 @@ rem          Alt tab open - Open windows and 5 most recent...
 reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v MultiTaskingAltTabFilter
 goto :eof
 
-:restore_ClassicContextMenu
-rem          Disable the classic context menu
-reg delete "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
-goto :eof
-
 :restore_SuggestWays
 rem          Enable "Suggest ways to get the most out of Windows..."
 reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /f /v ScoobeSystemSettingEnabled
@@ -492,18 +510,18 @@ goto :eof
 rem                     THIRD CHAPTER - WINGET
 :wingetmenu
 cls & %print% SELECT WHAT TO INSTALL: & echo.
-echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox ESR
+echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox
 echo: [4] Chrome                      [5] Notepad++                   [6] Discord
 echo: [7] Parsec                      [8] Steam                       [9] Epic Games Launcher
 echo: [10] Blender                    [11] Microsoft Teams            [12] OBS Studio
 echo: [13] Zero Tier One              [14] qBittorrent                [15] Sandboxie Plus
-echo: [16] Viber                      [17] JavaRE                     [18] PowerToys
-echo: [19] KeePass                    [20] Zoom                       [21] VLC
-echo: [22] Chocolatey GUI             [23] AutoHotkey                 [24] Wireshark
-echo: [25] GIMP                       [26] ShareX                     [27] LibreOffice
-echo: [28] Sumatra PDF                [29] VirtualBox                 [30] Visual Studio Code
+echo: [16] JavaRE                     [17] PowerToys                  [18] KeePass
+echo: [19] Zoom                       [20] VLC                        [21] Chocolatey GUI
+echo: [22] AutoHotkey                 [23] Wireshark                  [24] GIMP
+echo: [25] ShareX                     [26] LibreOffice                [27] Sumatra PDF
+echo: [28] VirtualBox                 [29] Visual Studio Code
 %print% [*] Install selected app/apps & echo [+] Check for updates & echo [0] Go back
-if exist %app_list% echo [/] Clear list of selected apps & echo %breakline% & %print% Selected apps: & type %app_list% 2>nul
+if exist %app_list_file% echo [/] Clear list of selected apps & echo %breakline% & %print% Selected apps: & type %app_list_file% 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 
@@ -523,7 +541,7 @@ if %symbol%==/  call :startofthewingetfile
 if %symbol%==0  goto :menu
 if %symbol%==1  call :CPPRedist
 if %symbol%==2  call :7zip
-if %symbol%==3  call :FirefoxESR
+if %symbol%==3  call :Firefox
 if %symbol%==4  call :Chrome
 if %symbol%==5  call :NotepadPP
 if %symbol%==6  call :Discord
@@ -536,21 +554,20 @@ if %symbol%==12 call :OBSStudio
 if %symbol%==13 call :ZeroTierOne
 if %symbol%==14 call :qBittorrent
 if %symbol%==15 call :SandboxiePlus
-if %symbol%==16 call :Viber
-if %symbol%==17 call :JavaRE
-if %symbol%==18 call :PowerToys
-if %symbol%==19 call :KeePass
-if %symbol%==20 call :Zoom
-if %symbol%==21 call :VLC
-if %symbol%==22 call :ChocolateyGUI
-if %symbol%==23 call :AutoHotkey
-if %symbol%==24 call :Wireshark
-if %symbol%==25 call :GIMP
-if %symbol%==26 call :ShareX
-if %symbol%==27 call :LibreOffice
-if %symbol%==28 call :SumatraPDF
-if %symbol%==29 call :VirtualBox
-if %symbol%==30 call :VisualStudioCode
+if %symbol%==16 call :JavaRE
+if %symbol%==17 call :PowerToys
+if %symbol%==18 call :KeePass
+if %symbol%==19 call :Zoom
+if %symbol%==20 call :VLC
+if %symbol%==21 call :ChocolateyGUI
+if %symbol%==22 call :AutoHotkey
+if %symbol%==23 call :Wireshark
+if %symbol%==24 call :GIMP
+if %symbol%==25 call :ShareX
+if %symbol%==26 call :LibreOffice
+if %symbol%==27 call :SumatraPDF
+if %symbol%==28 call :VirtualBox
+if %symbol%==29 call :VisualStudioCode
 if "%env%"=="debug" goto :eof
 if NOT "%env%"=="debug" goto :wingetmenu
 
@@ -574,7 +591,7 @@ goto :eof
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=C++ Redistributable 2005, 2008, 2012, 2013, 2015+ added"
 set wingetapp=Microsoft.VCRedist.2008.x86
-call :winget_app & call :app_list_txt
+call :winget_app & call :app_list_file_txt
 set wingetapp=Microsoft.VCRedist.2008.x64
 call :winget_app
 set wingetapp=Microsoft.VCRedist.2005.x86
@@ -598,120 +615,114 @@ call :winget_app & goto :eof
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=7zip added"
 set wingetapp=7zip.7zip
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
-:FirefoxESR
+:Firefox
 if not exist %winget_file% call :startofthewingetfile %mute%
-set "app_added=Firefox ESR added"
-set wingetapp=Mozilla.Firefox.ESR
-call :winget_app & call :app_list_txt & goto :eof
+set "app_added=Firefox added"
+set wingetapp=Mozilla.Firefox
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :Chrome
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Chrome added"
 set wingetapp=Google.Chrome
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :NotepadPP
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Notepad++ added"
 set wingetapp=Notepad++.Notepad++
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :Discord
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Discord added"
 set wingetapp=Discord.Discord
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :Parsec
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Parsec added"
 set wingetapp=Parsec.Parsec
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :Steam
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Steam added"
 set wingetapp=Valve.Steam
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :EpicGamesLauncher
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Epic Games Launcher added"
 set wingetapp=EpicGames.EpicGamesLauncher
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :Blender
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Blender added"
 set wingetapp=BlenderFoundation.Blender
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :MicrosoftTeams
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Microsoft Teams added"
 set wingetapp=Microsoft.Teams
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :OBSStudio
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=OBS Studio added"
 set wingetapp=OBSProject.OBSStudio
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :ZeroTierOne
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Zero Tier One added"
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :qBittorrent
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=qBittorrent added"
 set wingetapp=qBittorrent.qBittorrent
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :SandboxiePlus
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Sandboxie Plus added"
 set wingetapp=Sandboxie.Plus
-call :winget_app & call :app_list_txt & goto :eof
-
-:Viber
-if not exist %winget_file% call :startofthewingetfile %mute%
-set "app_added=Viber added"
-set wingetapp=Viber.Viber
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :JavaRE
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Java added"
 set wingetapp=Oracle.JavaRuntimeEnvironment
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :PowerToys
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=PowerToys added"
 set wingetapp=Microsoft.PowerToys
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :KeePass
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=KeePass added"
 set wingetapp=DominikReichl.KeePass
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :Zoom
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Zoom added"
 set wingetapp=Zoom.Zoom
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :VLC
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=VLC added"
 set wingetapp=VideoLAN.VLC
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :ChocolateyGUI
 choice /n /m "HAVE YOU ALREADY INSTALLED CHOCOLATEY? [Y/N]"
@@ -720,65 +731,65 @@ if errorlevel 1 goto :ChocolateyGUIcontinue
 
 :Chocolatey
 echo LAUNCHING CHOCOLATEY INSTALLATION SCRIPT
-powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) 
+powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 goto :ChocolateyGUIcontinue
 
 :ChocolateyGUIcontinue
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Chocolatey GUI added"
 set wingetapp=Chocolatey.ChocolateyGUI
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :AutoHotkey
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=AutoHotkey added"
 set wingetapp=AutoHotkey.AutoHotkey
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :Wireshark
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Wireshark added"
 set wingetapp=WiresharkFoundation.Wireshark
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :GIMP
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=GIMP added"
 set wingetapp=GIMP.GIMP
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :ShareX
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=ShareX added"
 set wingetapp=ShareX.ShareX
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :LibreOffice
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=LibreOffice added"
 set wingetapp=TheDocumentFoundation.LibreOffice
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :SumatraPDF
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Sumatra PDF added"
 set wingetapp=SumatraPDF.SumatraPDF
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :VirtualBox
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=VirtualBox added"
 set wingetapp=Oracle.VirtualBox
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :VisualStudioCode
 if not exist %winget_file% call :startofthewingetfile %mute%
 set "app_added=Visual Studio Code added"
 set wingetapp=Microsoft.VisualStudioCode
-call :winget_app & call :app_list_txt & goto :eof
+call :winget_app & call :app_list_file_txt & goto :eof
 
 :endofthewingetfile
-if not exist %app_list% goto :eof
+if not exist %app_list_file% goto :eof
 (
     echo            ],
     echo            "SourceDetails" : {
@@ -805,31 +816,18 @@ findstr /i /c:"%wingetapp%" %winget_file% %mute% && goto :eof
 ) >> %winget_file%
 goto :eof
 
-:app_list_txt
-if not exist %app_list% (
-    echo %app_added%>> %app_list%
+:app_list_file_txt
+if not exist %app_list_file% (
+    echo %app_added%>> %app_list_file%
 ) else (
-    findstr /i /c:"%app_added%" %app_list% %mute% || echo %app_added%>> %app_list%
+    findstr /i /c:"%app_added%" %app_list_file% %mute% || echo %app_added%>> %app_list_file%
 ) 
 goto :eof
 
 :delete
 if exist %winget_file% (
     del %winget_file% %mute%
-    del %app_list% %mute%
+    del %app_list_file% %mute%
     rmdir /s /q %Temp%\WinGet\ %mute%
 ) 
-goto :eof
-
-:win_ver
-set Version=
-for /f "tokens=2 delims==" %%a in ('wmic os get Caption /value') do set Version=%%a
-if "%Version:~0,20%"=="Microsoft Windows 10" goto :win10cmd else goto :win11cmd
-
-:win10cmd
-%win10arg%
-goto :eof
-
-:win11cmd
-%win11arg%
 goto :eof
