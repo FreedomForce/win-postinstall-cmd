@@ -1,19 +1,29 @@
 @echo off
 rem                     https://github.com/FreedomForce/win-postinstall-cmd
 
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Requesting administrator privileges...
+    powershell -Command "Start-Process '%0' -ArgumentList 'am_admin' -Verb RunAs"
+    exit /b
+)
 title win-postinstall-cmd
-if not "%1"=="am_admin" call powershell -h | %WINDIR%\System32\find.exe /i "powershell" > nul && if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin > nul & exit)
 setlocal EnableDelayedExpansion
 mode con: cols=145 lines=30
 title win-postinstall-cmd
 cd /d %~dp0
 
 rem                     variables
-rem set "env=debug" & @echo on
-rem "output=%Temp%\wpc_debug.txt"
 set "breakline=__________________________________________________________________________________________"
 set "print=echo. & echo"
 set "mute=>nul 2>&1"
+
+rem                     debug_variables
+rem set "env=debug" & @echo on
+rem set "output=%Temp%\wpc_debug.txt"
+rem set "mute=>>%output% 2>&1"
+
+rem                     windows_version_variables
 set Version=
 for /f "tokens=2 delims==" %%a in ('wmic os get Caption /value') do set Version=%%a
 if "%Version:~0,20%"=="Microsoft Windows 10" ( set "winversion=win10" ) else set "winversion=win11"
@@ -505,7 +515,7 @@ echo: [19] Zoom                       [20] VLC                        [21] Choco
 echo: [22] AutoHotkey                 [23] Wireshark                  [24] GIMP
 echo: [25] ShareX                     [26] LibreOffice                [27] Sumatra PDF
 echo: [28] VirtualBox                 [29] Visual Studio Code
-%print% [*] Install selected app/apps & echo [+] Check for updates & echo [0] Go back
+%print% [*] Install selected app/apps & echo [-] Use existing winget list & echo [+] Check for updates & echo [0] Go back
 if exist %app_list_file% echo [/] Clear list of selected apps & echo %breakline% & %print% Selected apps: & type %app_list_file% 2>nul
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
@@ -520,6 +530,7 @@ for /L %%i in (1,1,30) do (
 )
 
 :app_select
+if %symbol%==-  goto :existingWingetList
 if %symbol%==+  goto :checkForUpdates
 if %symbol%==*  call :endofthewingetfile
 if %symbol%==/  call :startofthewingetfile
@@ -555,6 +566,27 @@ if %symbol%==28 call :VirtualBox
 if %symbol%==29 call :VisualStudioCode
 if "%env%"=="debug" goto :eof
 if NOT "%env%"=="debug" goto :wingetmenu
+
+:existingWingetList
+@echo off
+
+rem Call PowerShell to open a file selection dialog
+for /f "usebackq tokens=*" %%i in (`powershell -command "Add-Type -AssemblyName System.Windows.Forms; $file = New-Object System.Windows.Forms.OpenFileDialog; $file.Filter = 'All Files (*.*)|*.*'; if($file.ShowDialog() -eq 'OK'){echo $file.FileName}"`) do (
+    set "selectedFile=%%i"
+)
+
+rem Check if a file was selected
+if "%selectedFile%"=="" (
+    echo No file selected. Exiting...
+    exit /b
+)
+
+rem  Output the selected file
+echo You selected: %selectedFile%
+
+rem Continue with the rest of your script using %selectedFile%
+winget import -i %selectedFile% --accept-source-agreements --accept-package-agreements
+pause & goto :wingetmenu
 
 :checkForUpdates
 winget upgrade --accept-source-agreements --all
