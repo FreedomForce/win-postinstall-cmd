@@ -89,7 +89,7 @@ cls & %print% SELECT YOUR TASK: & echo.
 echo: [1] Remove chat from taskbar                             [2] Remove Cortana from taskbar 
 echo: [3] Remove task view from taskbar                        [4] Remove search from taskbar
 echo: [5] Remove meet now                                      [6] Remove news and interests
-echo: [7] Remove taskbar pins                                  [8] Remove Widgets from the Taskbar
+echo: [7] Remove taskbar pins                                  [8] Remove Widgets from the Taskbar (Win11)
 echo: [9] Always hide most used list in start menu             [10] Disable show recently added apps (Win10)
 echo: [11] Disable "Show recently opened items in Start..."    [12] Enable Compact Mode
 echo: [13] Open file explorer to - This PC                     [14] Show file name extensions
@@ -185,13 +185,17 @@ goto :eof
 
 :import_WidgetsFromTheTaskbar_icon
 rem          Remove Widgets from the Taskbar
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarDa /t REG_DWORD /d 00000000
+if %winversion%==win10  goto :eof
+if %winversion%==win11  goto :win11_WidgetsFromTheTaskbar_icon
+
+:win11_WidgetsFromTheTaskbar_icon
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f
 goto :eof
 
 :import_MostUsedList
 rem          Always hide most used list in start menu
-if %winversion%==win10  goto :win10_MostUsedList                       %mute%
-if %winversion%==win11  goto :win11_MostUsedList                       %mute%
+if %winversion%==win10  goto :win10_MostUsedList
+if %winversion%==win11  goto :win11_MostUsedList
 
 :win10_MostUsedList
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v NoStartMenuMFUprogramsList /t REG_DWORD /d 00000001
@@ -208,7 +212,7 @@ goto :eof
 
 :import_ShowRecentlyAddedApps
 rem          Disable show recently added apps
-if %winversion%==win10  goto :win10_RecentlyAddedApps                       %mute%
+if %winversion%==win10  goto :win10_RecentlyAddedApps
 if %winversion%==win11  goto :eof
 
 :win10_RecentlyAddedApps
@@ -308,19 +312,19 @@ goto :eof
 
 :registry_restore
 cls & %print% SELECT YOUR TASK: & echo.
-echo: [1] Restore chat on taskbar                                               [2] Restore Cortana on taskbar 
-echo: [3] Restore task view on taskbar                                          [4] Restore search on taskbar
-echo: [5] Restore meet now                                                      [6] Restore news and interests
-echo: [7] Restore Widgets on the Taskbar                                        [8] Disable "Always hide most used list in start menu"
-echo: [9] Enable show recently added apps                                       [10] Enable "Show recently opened items in Start..."
-echo: [11] Disable Compact Mode                                                 [12] Open file explorer to - Quick access
-echo: [13] Disable Show file name extensions                                    [14] Restore Sound communications tab
-echo: [15] Enable startup sound                                                 [16] Restore enhance pointer precision
-echo: [17] Enable automatic maintenance                                         [18] Enable "Use my sign in info after restart"
-echo: [19] Alt tab open - Open windows and 5 most recent...                     [20] Enable "Suggest ways to get the most out of Windows..."
-echo: [21] Enable "Windows Experience ..."                                      [22] Enable "Get tips and suggestions when using Windows"
-echo: [23] Disable NumLock by default                                           [24] Enable Narrator + Sticky Keys
-echo: [25] Disable file explorer checkboxes                                     [26] Disable "Let me use a different input method for each app window"
+echo: [1] Restore chat on taskbar                          [2] Restore Cortana on taskbar 
+echo: [3] Restore task view on taskbar                     [4] Restore search on taskbar
+echo: [5] Restore meet now                                 [6] Restore news and interests
+echo: [7] Restore Widgets on the Taskbar                   [8] Disable "Always hide most used list in start menu"
+echo: [9] Enable show recently added apps                  [10] Enable "Show recently opened items in Start..."
+echo: [11] Disable Compact Mode                            [12] Open file explorer to - Quick access
+echo: [13] Disable Show file name extensions               [14] Restore Sound communications tab
+echo: [15] Enable startup sound                            [16] Restore enhance pointer precision
+echo: [17] Enable automatic maintenance                    [18] Enable "Use my sign in info after restart"
+echo: [19] Alt tab open - Open windows and 5 most recent...[20] Enable "Suggest ways to get the most out of Windows..."
+echo: [21] Enable "Windows Experience ..."                 [22] Enable "Get tips and suggestions when using Windows"
+echo: [23] Disable NumLock by default                      [24] Enable Narrator + Sticky Keys
+echo: [25] Disable file explorer checkboxes                [26] Disable "Let me use a different input method for each app window"
 %print% [0] Go back & echo [*] Select all
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
@@ -398,7 +402,7 @@ goto :eof
 
 :restore_WidgetsFromTheTaskbar_icon
 rem          Remove Widgets from the Taskbar
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarDa
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 1 /f
 goto :eof
 
 :restore_MostUsedList
@@ -505,16 +509,16 @@ goto :eof
 rem                     THIRD CHAPTER - WINGET
 :wingetmenu
 cls & %print% SELECT WHAT TO INSTALL: & echo.
-echo: [1] C++ Redistributables        [2] 7zip                        [3] Firefox
-echo: [4] Chrome                      [5] Notepad++                   [6] Discord
+echo: [1] C++ Redistributables        [2] Firefox                     [3] Chrome
+echo: [4] Notepad++                   [5] Visual Studio Code          [6] Discord
 echo: [7] Parsec                      [8] Steam                       [9] Epic Games Launcher
 echo: [10] Blender                    [11] Microsoft Teams            [12] OBS Studio
-echo: [13] Zero Tier One              [14] qBittorrent                [15] Sandboxie Plus
+echo: [13] ZeroTierOne                [14] qBittorrent                [15] Sandboxie Plus
 echo: [16] JavaRE                     [17] PowerToys                  [18] KeePass
 echo: [19] Zoom                       [20] VLC                        [21] Chocolatey GUI
 echo: [22] AutoHotkey                 [23] Wireshark                  [24] GIMP
 echo: [25] ShareX                     [26] LibreOffice                [27] Sumatra PDF
-echo: [28] VirtualBox                 [29] Visual Studio Code
+echo: [28] VirtualBox
 %print% [*] Install selected app/apps & echo [-] Use existing winget list & echo [+] Check for updates & echo [0] Go back
 if exist %app_list_file% echo [/] Clear list of selected apps & echo %breakline% & %print% Selected apps: & type %app_list_file% 2>nul
 
@@ -536,10 +540,10 @@ if %symbol%==*  call :endofthewingetfile
 if %symbol%==/  call :startofthewingetfile
 if %symbol%==0  goto :menu
 if %symbol%==1  call :CPPRedist
-if %symbol%==2  call :7zip
-if %symbol%==3  call :Firefox
-if %symbol%==4  call :Chrome
-if %symbol%==5  call :NotepadPP
+if %symbol%==2  call :Firefox
+if %symbol%==3  call :Chrome
+if %symbol%==4  call :NotepadPP
+if %symbol%==5  call :VisualStudioCode
 if %symbol%==6  call :Discord
 if %symbol%==7  call :Parsec
 if %symbol%==8  call :Steam
@@ -563,7 +567,6 @@ if %symbol%==25 call :ShareX
 if %symbol%==26 call :LibreOffice
 if %symbol%==27 call :SumatraPDF
 if %symbol%==28 call :VirtualBox
-if %symbol%==29 call :VisualStudioCode
 if "%env%"=="debug" goto :eof
 if NOT "%env%"=="debug" goto :wingetmenu
 
@@ -596,7 +599,7 @@ pause & goto :wingetmenu
 call :delete
 echo {>> %winget_file%
 echo    "$schema" : "https://aka.ms/winget-packages.schema.2.0.json",>> %winget_file%
-echo    "CreationDate" : "2023-04",>> %winget_file%
+echo    "CreationDate" : "2024-10-31T00:00:00.000-00:00",>> %winget_file%
 echo    "Sources" : >> %winget_file%
 echo    [>> %winget_file%
 echo        {>> %winget_file%
@@ -627,12 +630,6 @@ set wingetapp=Microsoft.VCRedist.2013.x64
 call :winget_app
 set wingetapp=Microsoft.VCRedist.2013.x86
 call :winget_app & goto :eof
-
-:7zip
-if not exist %winget_file% call :startofthewingetfile %mute%
-set "app_added=7zip added"
-set wingetapp=7zip.7zip
-call :winget_app & call :app_list_file_txt & goto :eof
 
 :Firefox
 if not exist %winget_file% call :startofthewingetfile %mute%
@@ -696,7 +693,8 @@ call :winget_app & call :app_list_file_txt & goto :eof
 
 :ZeroTierOne
 if not exist %winget_file% call :startofthewingetfile %mute%
-set "app_added=Zero Tier One added"
+set "app_added=ZeroTierOne added"
+set wingetapp=ZeroTier.ZeroTierOne
 call :winget_app & call :app_list_file_txt & goto :eof
 
 :qBittorrent
@@ -809,8 +807,9 @@ call :winget_app & call :app_list_file_txt & goto :eof
 if not exist %app_list_file% goto :eof
 (
     echo            ],
-    echo            "SourceDetails" : {
-    echo                "Argument" : "https://winget.azureedge.net/cache",
+    echo            "SourceDetails" : 
+    echo            {
+    echo                "Argument" : "https://cdn.winget.microsoft.com/cache",
     echo                "Identifier" : "Microsoft.Winget.Source_8wekyb3d8bbwe",
     echo                "Name" : "winget",
     echo                "Type" : "Microsoft.PreIndexed.Package"
