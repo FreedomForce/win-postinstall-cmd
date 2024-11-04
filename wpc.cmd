@@ -15,7 +15,7 @@ cd /d %~dp0
 
 rem                     variables
 set "breakline=__________________________________________________________________________________________"
-set "print=echo. & echo"
+set "print=echo. & echo:"
 set "mute=>nul 2>&1"
 
 rem                     debug_variables
@@ -34,7 +34,8 @@ set "winget_file=%Temp%\winget.json"
 
 :menu
 cls & call :delete
-%print% SELECT YOUR TASK: & echo.
+%print%SELECT YOUR TASK: 
+echo.
 echo: [1] Tweaks
 echo: [2] Import settings
 echo: [3] Install applications
@@ -43,16 +44,19 @@ set "number=Error" & echo. & set /p number=ENTER THE NUMBER:
 if %number%==1 goto :tweaks
 if %number%==2 goto :registry
 if %number%==3 goto :wingetmenu
+goto :menu
 
 rem                     FIRST CHAPTER - UPDATES AND USER SETTINGS
 :tweaks
-cls & %print% SELECT YOUR TASK: & echo.
+cls & %print%SELECT YOUR TASK: 
+echo.
 echo: [1] Check if winget is installed
 echo: [2] Check for updates
 echo: [3] Disable hibernate
 echo: [4] Disable password expiration
 echo: [5] Open old mixer
-%print% [0] Go back
+
+%print%[0] Go back
 
 set "number=Error" & echo. & set /p number=ENTER THE NUMBER: 
 if %number%==0 goto :menu
@@ -85,7 +89,8 @@ goto :tweaks
 
 rem                     SECOND CHAPTER - REGISTRY KEYS
 :registry
-cls & %print% SELECT YOUR TASK: & echo.
+cls & %print%SELECT YOUR TASK: 
+echo.
 echo: [1] Remove chat from taskbar                             [2] Remove Cortana from taskbar 
 echo: [3] Remove task view from taskbar                        [4] Remove search from taskbar
 echo: [5] Remove meet now                                      [6] Remove news and interests
@@ -100,7 +105,8 @@ echo: [21] Disable "Suggest ways to get the most out of Win..."[22] Disable "Win
 echo: [23] Disable "Get tips and suggestions when using Win..."[24] Enable NumLock by default
 echo: [25] Disable (Narrator + Sticky Keys)                    [26] Enable file explorer checkboxes
 echo: [27] Different input method for each app window
-%print% [0] Go back & echo [*] Select all & echo [/] Restore settings
+
+%print%[0] Go back    [*] Select all    [/] Restore settings
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 
@@ -311,7 +317,8 @@ reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t R
 goto :eof
 
 :registry_restore
-cls & %print% SELECT YOUR TASK: & echo.
+cls & %print%SELECT YOUR TASK: 
+echo.
 echo: [1] Restore chat on taskbar                          [2] Restore Cortana on taskbar 
 echo: [3] Restore task view on taskbar                     [4] Restore search on taskbar
 echo: [5] Restore meet now                                 [6] Restore news and interests
@@ -325,7 +332,8 @@ echo: [19] Alt tab open - Open windows and 5 most recent...[20] Enable "Suggest 
 echo: [21] Enable "Windows Experience ..."                 [22] Enable "Get tips and suggestions when using Windows"
 echo: [23] Disable NumLock by default                      [24] Enable Narrator + Sticky Keys
 echo: [25] Disable file explorer checkboxes                [26] Disable "Let me use a different input method for each app window"
-%print% [0] Go back & echo [*] Select all
+
+%print%[0] Go back    [*] Select all
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 
@@ -508,7 +516,8 @@ goto :eof
 
 rem                     THIRD CHAPTER - WINGET
 :wingetmenu
-cls & %print% SELECT WHAT TO INSTALL: & echo.
+cls & %print%SELECT WHAT TO INSTALL: 
+echo.
 echo: [1] C++ Redistributables        [2] Firefox                     [3] Chrome
 echo: [4] Notepad++                   [5] Visual Studio Code          [6] Discord
 echo: [7] Parsec                      [8] Steam                       [9] Epic Games Launcher
@@ -519,8 +528,13 @@ echo: [19] Zoom                       [20] VLC                        [21] Choco
 echo: [22] AutoHotkey                 [23] Wireshark                  [24] GIMP
 echo: [25] ShareX                     [26] LibreOffice                [27] Sumatra PDF
 echo: [28] VirtualBox
-%print% [*] Install selected app/apps & echo [-] Use existing winget list & echo [+] Check for updates & echo [0] Go back
-if exist %app_list_file% echo [/] Clear list of selected apps & echo %breakline% & %print% Selected apps: & type %app_list_file% 2>nul
+
+%print%[0] Go back    [*] Install app/apps    [-] Use winget list
+if exist %app_list_file% (
+echo:[/] Clear the list 
+echo %breakline% & %print%Selected apps: 
+type %app_list_file% 2>nul
+)
 
 set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL: 
 
@@ -535,7 +549,6 @@ for /L %%i in (1,1,30) do (
 
 :app_select
 if %symbol%==-  goto :existingWingetList
-if %symbol%==+  goto :checkForUpdates
 if %symbol%==*  call :endofthewingetfile
 if %symbol%==/  call :startofthewingetfile
 if %symbol%==0  goto :menu
@@ -571,28 +584,15 @@ if "%env%"=="debug" goto :eof
 if NOT "%env%"=="debug" goto :wingetmenu
 
 :existingWingetList
-@echo off
-
-rem Call PowerShell to open a file selection dialog
 for /f "usebackq tokens=*" %%i in (`powershell -command "Add-Type -AssemblyName System.Windows.Forms; $file = New-Object System.Windows.Forms.OpenFileDialog; $file.Filter = 'All Files (*.*)|*.*'; if($file.ShowDialog() -eq 'OK'){echo $file.FileName}"`) do (
     set "selectedFile=%%i"
 )
-
-rem Check if a file was selected
 if "%selectedFile%"=="" (
     echo No file selected. Exiting...
     exit /b
 )
-
-rem  Output the selected file
 echo You selected: %selectedFile%
-
-rem Continue with the rest of your script using %selectedFile%
 winget import -i %selectedFile% --accept-source-agreements --accept-package-agreements
-pause & goto :wingetmenu
-
-:checkForUpdates
-winget upgrade --accept-source-agreements --all
 pause & goto :wingetmenu
 
 :startofthewingetfile
@@ -819,7 +819,8 @@ if not exist %app_list_file% goto :eof
     echo }
 ) >> %winget_file%
 
-echo %breakline% & %print% PRESS ANY KEY TO INSTALL SELECTED APP/APPS & pause
+echo %breakline% & %print%PRESS ANY KEY TO INSTALL SELECTED APP/APPS 
+pause
 winget import -i %winget_file% --accept-source-agreements --accept-package-agreements
 pause & call :delete & goto :wingetmenu
 
