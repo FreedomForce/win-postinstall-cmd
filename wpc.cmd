@@ -91,9 +91,9 @@ rem                     SECOND CHAPTER - REGISTRY KEYS
 :registry
 cls & %print%SELECT YOUR TASK: 
 echo.
-echo: [1] Remove chat from taskbar                             [2] Remove Cortana from taskbar 
+echo: [1] Disable Snap Assist                                  [2] Remove Cortana from taskbar (Win10)
 echo: [3] Remove task view from taskbar                        [4] Remove search from taskbar
-echo: [5] Remove meet now                                      [6] Remove news and interests
+echo: [5] Remove meet now (Win10)                              [6] Remove news and interests (Win10)
 echo: [7] Remove taskbar pins                                  [8] Remove Widgets from the Taskbar (Win11)
 echo: [9] Always hide most used list in start menu             [10] Disable show recently added apps (Win10)
 echo: [11] Disable "Show recently opened items in Start..."    [12] Enable Compact Mode
@@ -104,7 +104,7 @@ echo: [19] Disable "Use my sign in info after restart"         [20] Alt tab - op
 echo: [21] Disable "Suggest ways to get the most out of Win..."[22] Disable "Windows Experience ..."
 echo: [23] Disable "Get tips and suggestions when using Win..."[24] Enable NumLock by default
 echo: [25] Disable (Narrator + Sticky Keys)                    [26] Enable file explorer checkboxes
-echo: [27] Different input method for each app window
+echo: [27] Different input method for each app window          [28] Enable "End Task" in taskbar
 
 %print%[0] Go back    [*] Select all    [/] Restore settings
 
@@ -114,7 +114,7 @@ set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL:
 if %symbol%==/  goto :registry_restore
 if %symbol%==*  goto :registry_all_keys
 if %symbol%==0  call :menu
-if %symbol%==1  call :import_chat                       %mute%
+if %symbol%==1  call :import_SnapAssist                 %mute%
 if %symbol%==2  call :import_cortana_icon               %mute%
 if %symbol%==3  call :import_TaskView_icon              %mute%
 if %symbol%==4  call :import_search_icon                %mute%
@@ -141,6 +141,7 @@ if %symbol%==24 call :import_NumLock                    %mute%
 if %symbol%==25 call :import_EaseOfAccessSettings       %mute%
 if %symbol%==26 call :import_CheckBoxes                 %mute%
 if %symbol%==27 call :import_DifferentInputMethod       %mute%
+if %symbol%==28 call :import_EndTask                    %mute%
 if "%loop%"=="1" goto :eof
 if NOT "%loop%"=="1" goto :registry
 
@@ -153,12 +154,16 @@ for /L %%i in (1,1,28) do (
 set "loop=0"
 goto :registry
 
-:import_chat
-rem          Remove chat from taskbar
-reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarMn /t REG_DWORD /d 00000000
+:import_SnapAssist
+rem          Disable Snap Assist
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v SnapAssist /t REG_DWORD /d 00000000
 goto :eof
 
 :import_cortana_icon
+if %winversion%==win10  goto :win10_cortana_icon
+if %winversion%==win11  goto :eof
+
+:win10_cortana_icon
 rem          Remove Cortana from taskbar
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v ShowCortanaButton /t REG_DWORD /d 00000000
 goto :eof
@@ -175,10 +180,18 @@ goto :eof
 
 :import_meet_icon
 rem          Remove meet now
+if %winversion%==win10  goto :win10_meet_icon
+if %winversion%==win11  goto :eof
+
+:win10_meet_icon
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /f /v HideSCAMeetNow /t REG_DWORD /d 00000001
 goto :eof
 
 :import_NewsAndInterests_icon
+if %winversion%==win10  goto :win10_NewsAndInterests_icon
+if %winversion%==win11  goto :eof
+
+:win10_NewsAndInterests_icon
 rem          Remove news and interests
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Windows Feeds" /f /v EnableFeeds /t REG_DWORD /d 00000000
 goto :eof
@@ -253,7 +266,7 @@ goto :eof
 
 :import_StartupSound
 rem          Disable startup sound
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation" /f /v DisableStartupSound /t REG_DWORD /d 00000001
+powershell Set-ItemProperty -Path HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name DisableStartupSound -Value 1 -Force
 goto :eof
 
 :import_EnhancePointerPrecision
@@ -316,10 +329,15 @@ rem          Let me use a different input method for each app window
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e068092000000
 goto :eof
 
+:import_EndTask
+rem          Enable end task in taskbar by right click
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" /v TaskbarEndTask /t REG_DWORD /d 1 /f
+goto :eof
+
 :registry_restore
 cls & %print%SELECT YOUR TASK: 
 echo.
-echo: [1] Restore chat on taskbar                          [2] Restore Cortana on taskbar 
+echo: [1] Enable Snap Assist                               [2] Restore Cortana on taskbar 
 echo: [3] Restore task view on taskbar                     [4] Restore search on taskbar
 echo: [5] Restore meet now                                 [6] Restore news and interests
 echo: [7] Restore Widgets on the Taskbar                   [8] Disable "Always hide most used list in start menu"
@@ -332,6 +350,7 @@ echo: [19] Alt tab open - Open windows and 5 most recent...[20] Enable "Suggest 
 echo: [21] Enable "Windows Experience ..."                 [22] Enable "Get tips and suggestions when using Windows"
 echo: [23] Disable NumLock by default                      [24] Enable Narrator + Sticky Keys
 echo: [25] Disable file explorer checkboxes                [26] Disable "Let me use a different input method for each app window"
+echo: [27] Disable "End Task" in taskbar
 
 %print%[0] Go back    [*] Select all
 
@@ -340,7 +359,7 @@ set "symbol=Error" & echo. & set /p symbol=ENTER THE SYMBOL:
 :reg_res_select
 if %symbol%==*  goto :registry_restore_all_keys
 if %symbol%==0  goto :registry
-if %symbol%==1  call :restore_chat                       %mute%
+if %symbol%==1  call :restore_SnapAssist                 %mute%
 if %symbol%==2  call :restore_cortana_icon               %mute%
 if %symbol%==3  call :restore_TaskView_icon              %mute%
 if %symbol%==4  call :restore_search_icon                %mute%
@@ -366,6 +385,7 @@ if %symbol%==23 call :restore_NumLock                    %mute%
 if %symbol%==24 call :restore_EaseOfAccessSettings       %mute%
 if %symbol%==25 call :restore_CheckBoxes                 %mute%
 if %symbol%==26 call :restore_DifferentInputMethod       %mute%
+if %symbol%==27 call :restore_EndTask                    %mute%
 if "%loop%"=="1" goto :eof
 if NOT "%loop%"=="1" goto :registry_restore
 
@@ -378,9 +398,10 @@ for /L %%i in (1,1,27) do (
 set "loop=0"
 goto :registry_restore
 
-:restore_chat
-rem          Restore chat on taskbar
-reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v TaskbarMn
+:restore_SnapAssist
+rem          Restore Snap Assist
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v SnapAssist /t REG_DWORD /d 00000001
+reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v WindowArrangementActive /t REG_DWORD /d 1
 goto :eof
 
 :restore_cortana_icon
@@ -451,7 +472,7 @@ goto :eof
 
 :restore_StartupSound
 rem          Enable startup sound
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation" /f /v DisableStartupSound /t REG_DWORD /d 00000000
+powershell Remove-ItemProperty -Path HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System -Name DisableStartupSound
 goto :eof
 
 :restore_EnhancePointerPrecision
@@ -512,6 +533,11 @@ goto :eof
 :restore_DifferentInputMethod
 rem          Disable "Let me use a different input method for each app window"
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /f /v UserPreferencesMask /t REG_BINARY /d 9e1e078012000000
+goto :eof
+
+:restore_EndTask
+rem          Disable end task in taskbar by right click
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" /v TaskbarEndTask /t REG_DWORD /d 0 /f
 goto :eof
 
 rem                     THIRD CHAPTER - WINGET
